@@ -1,5 +1,9 @@
 pragma solidity >=0.5.0;
 
+import "./IBDeployer.sol";
+import "./ICDeployer.sol";
+import "./IEleosPriceOracle.sol";
+
 interface IFactory {
 	event LendingPoolInitialized(address indexed uniswapV2Pair, address indexed token0, address indexed token1,
 		address collateral, address borrowable0, address borrowable1, uint lendingPoolId);
@@ -25,9 +29,9 @@ interface IFactory {
 	function allLendingPools(uint) external view returns (address uniswapV2Pair);
 	function allLendingPoolsLength() external view returns (uint);
 	
-	function bDeployer() external view returns (address);
-	function cDeployer() external view returns (address);
-	function eleosPriceOracle() external view returns (address);
+	function bDeployer() external view returns (IBDeployer);
+	function cDeployer() external view returns (ICDeployer);
+	function eleosPriceOracle() external view returns (IEleosPriceOracle);
 
 	function createCollateral(address uniswapV2Pair) external returns (address collateral);
 	function createBorrowable0(address uniswapV2Pair) external returns (address borrowable0);

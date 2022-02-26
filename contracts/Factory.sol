@@ -23,16 +23,16 @@ contract Factory is IFactory {
         address borrowable0;
         address borrowable1;
     }
-    mapping(address => LendingPool) public getLendingPool; // get by UniswapV2Pair
-    address[] public allLendingPools; // address of the UniswapV2Pair
+    mapping(address => LendingPool) public override getLendingPool; // get by UniswapV2Pair
+    address[] public override allLendingPools; // address of the UniswapV2Pair
 
-    function allLendingPoolsLength() external view returns (uint256) {
+    function allLendingPoolsLength() external view override returns (uint256) {
         return allLendingPools.length;
     }
 
-    IBDeployer public bDeployer;
-    ICDeployer public cDeployer;
-    IEleosPriceOracle public eleosPriceOracle;
+    IBDeployer public override bDeployer;
+    ICDeployer public override cDeployer;
+    IEleosPriceOracle public override eleosPriceOracle;
 
     event LendingPoolInitialized(
         address indexed uniswapV2Pair,
@@ -140,7 +140,7 @@ contract Factory is IFactory {
         getLendingPool[uniswapV2Pair].borrowable1 = borrowable1;
     }
 
-    function initializeLendingPool(address uniswapV2Pair) external {
+    function initializeLendingPool(address uniswapV2Pair) external override {
         (address token0, address token1) = _getTokens(uniswapV2Pair);
         LendingPool memory lPool = getLendingPool[uniswapV2Pair];
         require(!lPool.initialized, "Eleos: ALREADY_INITIALIZED");
@@ -158,8 +158,9 @@ contract Factory is IFactory {
             "Eleos: BORROWABLE1_NOT_CREATED"
         );
 
-        (, , , , , bool oracleInitialized) =
-            eleosPriceOracle.getPair(uniswapV2Pair);
+        (, , , , , bool oracleInitialized) = eleosPriceOracle.getPair(
+            uniswapV2Pair
+        );
         if (!oracleInitialized) eleosPriceOracle.initialize(uniswapV2Pair);
 
         ICollateral(lPool.collateral)._initialize(
@@ -194,14 +195,14 @@ contract Factory is IFactory {
         );
     }
 
-    function _setPendingAdmin(address newPendingAdmin) external {
+    function _setPendingAdmin(address newPendingAdmin) external override {
         require(msg.sender == admin, "Eleos: UNAUTHORIZED");
         address oldPendingAdmin = pendingAdmin;
         pendingAdmin = newPendingAdmin;
         emit NewPendingAdmin(oldPendingAdmin, newPendingAdmin);
     }
 
-    function _acceptAdmin() external {
+    function _acceptAdmin() external override {
         require(msg.sender == pendingAdmin, "Eleos: UNAUTHORIZED");
         address oldAdmin = admin;
         address oldPendingAdmin = pendingAdmin;
@@ -213,6 +214,7 @@ contract Factory is IFactory {
 
     function _setReservesPendingAdmin(address newReservesPendingAdmin)
         external
+        override
     {
         require(msg.sender == reservesAdmin, "Eleos: UNAUTHORIZED");
         address oldReservesPendingAdmin = reservesPendingAdmin;
@@ -223,7 +225,7 @@ contract Factory is IFactory {
         );
     }
 
-    function _acceptReservesAdmin() external {
+    function _acceptReservesAdmin() external override {
         require(msg.sender == reservesPendingAdmin, "Eleos: UNAUTHORIZED");
         address oldReservesAdmin = reservesAdmin;
         address oldReservesPendingAdmin = reservesPendingAdmin;
@@ -233,7 +235,7 @@ contract Factory is IFactory {
         emit NewReservesPendingAdmin(oldReservesPendingAdmin, address(0));
     }
 
-    function _setReservesManager(address newReservesManager) external {
+    function _setReservesManager(address newReservesManager) external override {
         require(msg.sender == reservesAdmin, "Eleos: UNAUTHORIZED");
         address oldReservesManager = reservesManager;
         reservesManager = newReservesManager;

@@ -20,24 +20,32 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     /*** Collateralization Model ***/
 
     // returns the prices of borrowable0's and borrowable1's underlyings with collateral's underlying as denom
-    function getPrices() public virtual returns (uint256 price0, uint256 price1) {
-        (uint224 twapPrice112x112, ) =
-            IEleosPriceOracle(eleosPriceOracle).getResult(underlying);
-        (uint112 reserve0, uint112 reserve1, ) =
-            IUniswapV2Pair(underlying).getReserves();
-        uint256 collateralTotalSupply =
-            IUniswapV2Pair(underlying).totalSupply();
+    function getPrices()
+        public
+        virtual
+        returns (uint256 price0, uint256 price1)
+    {
+        (uint224 twapPrice112x112, ) = IEleosPriceOracle(eleosPriceOracle)
+            .getResult(underlying);
+        (uint112 reserve0, uint112 reserve1, ) = IUniswapV2Pair(underlying)
+            .getReserves();
+        uint256 collateralTotalSupply = IUniswapV2Pair(underlying)
+            .totalSupply();
 
-        uint224 currentPrice112x112 =
-            UQ112x112.encode(reserve1).uqdiv(reserve0);
-        uint256 adjustmentSquared =
-            uint256(twapPrice112x112).mul(2**32).div(currentPrice112x112);
+        uint224 currentPrice112x112 = UQ112x112.encode(reserve1).uqdiv(
+            reserve0
+        );
+        uint256 adjustmentSquared = uint256(twapPrice112x112).mul(2**32).div(
+            currentPrice112x112
+        );
         uint256 adjustment = Math.sqrt(adjustmentSquared.mul(2**32));
 
-        uint256 currentBorrowable0Price =
-            uint256(collateralTotalSupply).mul(1e18).div(reserve0 * 2);
-        uint256 currentBorrowable1Price =
-            uint256(collateralTotalSupply).mul(1e18).div(reserve1 * 2);
+        uint256 currentBorrowable0Price = uint256(collateralTotalSupply)
+            .mul(1e18)
+            .div(reserve0 * 2);
+        uint256 currentBorrowable1Price = uint256(collateralTotalSupply)
+            .mul(1e18)
+            .div(reserve1 * 2);
 
         price0 = currentBorrowable0Price.mul(adjustment).div(2**32);
         price1 = currentBorrowable1Price.mul(2**32).div(adjustment);
@@ -85,15 +93,22 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         super._transfer(from, to, value);
     }
 
-    function tokensUnlocked(address from, uint256 value) public virtual returns (bool) {
+    function tokensUnlocked(address from, uint256 value)
+        public
+        virtual
+        returns (bool)
+    {
         uint256 _balance = balanceOf[from];
         if (value > _balance) return false;
         uint256 finalBalance = _balance - value;
         uint256 amountCollateral = finalBalance.mul(exchangeRate()).div(1e18);
         uint256 amount0 = IBorrowable(borrowable0).borrowBalance(from);
         uint256 amount1 = IBorrowable(borrowable1).borrowBalance(from);
-        (, uint256 shortfall) =
-            _calculateLiquidity(amountCollateral, amount0, amount1);
+        (, uint256 shortfall) = _calculateLiquidity(
+            amountCollateral,
+            amount0,
+            amount1
+        );
         return shortfall == 0;
     }
 
@@ -108,14 +123,16 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
             amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
         if (amount1 == uint256(-1))
             amount1 = IBorrowable(borrowable1).borrowBalance(borrower);
-        uint256 amountCollateral =
-            balanceOf[borrower].mul(exchangeRate()).div(1e18);
+        uint256 amountCollateral = balanceOf[borrower].mul(exchangeRate()).div(
+            1e18
+        );
         return _calculateLiquidity(amountCollateral, amount0, amount1);
     }
 
     function accountLiquidity(address borrower)
         public
         virtual
+        override
         returns (uint256 liquidity, uint256 shortfall)
     {
         return accountLiquidityAmounts(borrower, uint256(-1), uint256(-1));
@@ -125,19 +142,24 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address borrower,
         address borrowable,
         uint256 accountBorrows
-    ) public virtual returns (bool) {
+    ) public virtual override returns (bool) {
         address _borrowable0 = borrowable0;
         address _borrowable1 = borrowable1;
         require(
             borrowable == _borrowable0 || borrowable == _borrowable1,
             "Eleos: INVALID_BORROWABLE"
         );
-        uint256 amount0 =
-            borrowable == _borrowable0 ? accountBorrows : uint256(-1);
-        uint256 amount1 =
-            borrowable == _borrowable1 ? accountBorrows : uint256(-1);
-        (, uint256 shortfall) =
-            accountLiquidityAmounts(borrower, amount0, amount1);
+        uint256 amount0 = borrowable == _borrowable0
+            ? accountBorrows
+            : uint256(-1);
+        uint256 amount1 = borrowable == _borrowable1
+            ? accountBorrows
+            : uint256(-1);
+        (, uint256 shortfall) = accountLiquidityAmounts(
+            borrower,
+            amount0,
+            amount1
+        );
         return shortfall == 0;
     }
 
@@ -146,7 +168,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address liquidator,
         address borrower,
         uint256 repayAmount
-    ) external returns (uint256 seizeTokens) {
+    ) external override returns (uint256 seizeTokens) {
         require(
             msg.sender == borrowable0 || msg.sender == borrowable1,
             "Eleos: UNAUTHORIZED"
@@ -178,7 +200,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address redeemer,
         uint256 redeemAmount,
         bytes calldata data
-    ) external nonReentrant update {
+    ) external override nonReentrant update {
         require(redeemAmount <= totalBalance, "Eleos: INSUFFICIENT_CASH");
 
         // optimistically transfer funds
@@ -187,8 +209,10 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
             IEleosCallee(redeemer).eleosRedeem(msg.sender, redeemAmount, data);
 
         uint256 redeemTokens = balanceOf[address(this)];
-        uint256 declaredRedeemTokens =
-            redeemAmount.mul(1e18).div(exchangeRate()).add(1); // rounded up
+        uint256 declaredRedeemTokens = redeemAmount
+            .mul(1e18)
+            .div(exchangeRate())
+            .add(1); // rounded up
         require(
             redeemTokens >= declaredRedeemTokens,
             "Eleos: INSUFFICIENT_REDEEM_TOKENS"

@@ -72,7 +72,7 @@ contract EleosERC20 {
         address from,
         address to,
         uint256 value
-    ) internal {
+    ) internal override {
         balanceOf[from] = balanceOf[from].sub(
             value,
             "Eleos: TRANSFER_TOO_HIGH"
@@ -117,23 +117,22 @@ contract EleosERC20 {
         bytes32 typehash
     ) internal {
         require(deadline >= block.timestamp, "Eleos: EXPIRED");
-        bytes32 digest =
-            keccak256(
-                abi.encodePacked(
-                    "\x19\x01",
-                    DOMAIN_SEPARATOR,
-                    keccak256(
-                        abi.encode(
-                            typehash,
-                            owner,
-                            spender,
-                            value,
-                            nonces[owner]++,
-                            deadline
-                        )
+        bytes32 digest = keccak256(
+            abi.encodePacked(
+                "\x19\x01",
+                DOMAIN_SEPARATOR,
+                keccak256(
+                    abi.encode(
+                        typehash,
+                        owner,
+                        spender,
+                        value,
+                        nonces[owner]++,
+                        deadline
                     )
                 )
-            );
+            )
+        );
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(
             recoveredAddress != address(0) && recoveredAddress == owner,

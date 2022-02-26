@@ -36,12 +36,12 @@ contract PoolToken is IPoolToken, EleosERC20 {
 
     /*** PoolToken ***/
 
-    function _update() internal {
+    function _update() internal virtual {
         totalBalance = IERC20(underlying).balanceOf(address(this));
         emit Sync(totalBalance);
     }
 
-    function exchangeRate() public override returns (uint256) {
+    function exchangeRate() public virtual override returns (uint256) {
         uint256 _totalSupply = totalSupply; // gas savings
         uint256 _totalBalance = totalBalance; // gas savings
         if (_totalSupply == 0 || _totalBalance == 0) return initialExchangeRate;
@@ -51,9 +51,9 @@ contract PoolToken is IPoolToken, EleosERC20 {
     // this low-level function should be called from another contract
     function mint(address minter)
         external
+        override
         nonReentrant
         update
-        override
         returns (uint256 mintTokens)
     {
         uint256 balance = IERC20(underlying).balanceOf(address(this));
@@ -73,9 +73,9 @@ contract PoolToken is IPoolToken, EleosERC20 {
     // this low-level function should be called from another contract
     function redeem(address redeemer)
         external
+        override
         nonReentrant
         update
-        override
         returns (uint256 redeemAmount)
     {
         uint256 redeemTokens = balanceOf[address(this)];
@@ -97,7 +97,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
     }
 
     // force totalBalance to match real balance
-    function sync() external nonReentrant override update {}
+    function sync() external virtual override nonReentrant update {}
 
     /*** Utilities ***/
 
@@ -106,8 +106,9 @@ contract PoolToken is IPoolToken, EleosERC20 {
         bytes4(keccak256(bytes("transfer(address,uint256)")));
 
     function _safeTransfer(address to, uint256 amount) internal {
-        (bool success, bytes memory data) =
-            underlying.call(abi.encodeWithSelector(SELECTOR, to, amount));
+        (bool success, bytes memory data) = underlying.call(
+            abi.encodeWithSelector(SELECTOR, to, amount)
+        );
         require(
             success && (data.length == 0 || abi.decode(data, (bool))),
             "Eleos: TRANSFER_FAILED"

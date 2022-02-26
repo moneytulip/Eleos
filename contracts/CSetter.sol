@@ -27,7 +27,7 @@ contract CSetter is PoolToken, CStorage {
         underlying = _underlying;
         borrowable0 = _borrowable0;
         borrowable1 = _borrowable1;
-        eleosPriceOracle = IFactory(factory).eleosPriceOracle();
+        eleosPriceOracle = address(IFactory(factory).eleosPriceOracle());
     }
 
     function _setSafetyMarginSqrt(uint256 newSafetyMarginSqrt)

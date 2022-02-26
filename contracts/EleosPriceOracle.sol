@@ -7,7 +7,7 @@ import "./interfaces/IEleosPriceOracle.sol";
 contract EleosPriceOracle is IEleosPriceOracle {
     using UQ112x112 for uint224;
 
-    uint32 public constant MIN_T = 1200;
+    uint32 public constant override MIN_T = 1200;
 
     struct Pair {
         uint256 priceCumulativeSlotA;
@@ -17,7 +17,7 @@ contract EleosPriceOracle is IEleosPriceOracle {
         bool latestIsSlotA;
         bool initialized;
     }
-    mapping(address => Pair) public getPair;
+    mapping(address => Pair) public override getPair;
 
     event PriceUpdate(
         address indexed pair,
@@ -71,6 +71,7 @@ contract EleosPriceOracle is IEleosPriceOracle {
 
     function getResult(address uniswapV2Pair)
         external
+        override
         returns (uint224 price, uint32 T)
     {
         Pair memory pair = getPair[uniswapV2Pair];
