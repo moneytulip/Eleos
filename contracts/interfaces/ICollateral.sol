@@ -5,16 +5,6 @@ import "./IPoolToken.sol";
 interface ICollateral is IPoolToken {
     /*** Collateral ***/
 
-    function borrowable0() external view returns (address);
-
-    function borrowable1() external view returns (address);
-
-    function eleosPriceOracle() external view returns (address);
-
-    function safetyMarginSqrt() external view returns (uint256);
-
-    function liquidationIncentive() external view returns (uint256);
-
     function getPrices() external returns (uint256 price0, uint256 price1);
 
     function tokensUnlocked(address from, uint256 value)
