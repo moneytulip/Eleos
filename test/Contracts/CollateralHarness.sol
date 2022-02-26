@@ -35,7 +35,7 @@ contract CollateralHarness is Collateral {
 	uint public _price0;
 	uint public _price1;
 	
-	function getPrices() public returns (uint price0, uint price1) {
+	function getPrices() public override returns (uint price0, uint price1) {
 		if (useMockPrices) return (_price0, _price1);
 		return super.getPrices();
 	}
@@ -53,7 +53,7 @@ contract CollateralHarness is Collateral {
 	bool public useMockExchangeRate;
 	uint public _exchangeRate;
 	
-	function exchangeRate() public returns (uint) {
+	function exchangeRate() public override returns (uint) {
 		if (useMockExchangeRate) return _exchangeRate;
 		return super.exchangeRate();
 	}
@@ -67,7 +67,7 @@ contract CollateralHarness is Collateral {
 	mapping(address => uint) public _liquidity;
 	mapping(address => uint) public _shortfall;
 	
-	function accountLiquidity(address borrower) public returns (uint liquidity, uint shortfall) {
+	function accountLiquidity(address borrower) public override returns (uint liquidity, uint shortfall) {
 		if (useMockaAccountLiquidity) return (_liquidity[borrower], _shortfall[borrower]);
 		return super.accountLiquidity(borrower);
 	}
@@ -81,7 +81,7 @@ contract CollateralHarness is Collateral {
 	bool public useMockCanBorrow;
 	mapping(address => mapping(address => uint)) public maxBorrowable;
 	
-	function canBorrow(address borrower, address borrowable, uint amount) public returns (bool) {
+	function canBorrow(address borrower, address borrowable, uint amount) public override returns (bool) {
 		if (useMockCanBorrow){
 			return maxBorrowable[borrower][borrowable] >= amount;
 		}
@@ -95,7 +95,7 @@ contract CollateralHarness is Collateral {
 	
 	bool public useMockTokensUnlocked;
 	
-	function tokensUnlocked(address from, uint value) public returns (bool) {
+	function tokensUnlocked(address from, uint value) public override returns (bool) {
 		if (useMockTokensUnlocked){
 			return true;
 		}

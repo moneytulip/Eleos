@@ -92,7 +92,7 @@ contract Borrowable is
     /*** Borrowable ***/
 
     // this is the stored borrow balance; the current borrow balance may be slightly higher
-    function borrowBalance(address borrower) public view returns (uint256) {
+    function borrowBalance(address borrower) public view virtual returns (uint256) {
         BorrowSnapshot memory borrowSnapshot = borrowBalances[borrower];
         if (borrowSnapshot.interestIndex == 0) return 0; // not initialized
         return

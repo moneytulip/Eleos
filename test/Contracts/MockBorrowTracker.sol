@@ -11,7 +11,7 @@ contract MockBorrowTracker is IBorrowTracker {
 	mapping(address => uint) public relativeBorrow;
 	uint public totalRelativeBorrows;
 
-	function trackBorrow(address borrower, uint borrowBalance, uint borrowIndex) external {
+	function trackBorrow(address borrower, uint borrowBalance, uint borrowIndex) external override {
 		uint _relativeBorrowPrior = relativeBorrow[borrower];
 		uint _relativeBorrow = borrowBalance.mul(2**128).div(borrowIndex);
 		relativeBorrow[borrower] = _relativeBorrow;

@@ -45,7 +45,7 @@ contract EleosPriceOracle is IEleosPriceOracle {
         priceCumulative += uint256(priceLatest) * timeElapsed;
     }
 
-    function initialize(address uniswapV2Pair) external {
+    function initialize(address uniswapV2Pair) external override {
         Pair storage pairStorage = getPair[uniswapV2Pair];
         require(
             !pairStorage.initialized,

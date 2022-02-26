@@ -20,7 +20,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     /*** Collateralization Model ***/
 
     // returns the prices of borrowable0's and borrowable1's underlyings with collateral's underlying as denom
-    function getPrices() public returns (uint256 price0, uint256 price1) {
+    function getPrices() public virtual returns (uint256 price0, uint256 price1) {
         (uint224 twapPrice112x112, ) =
             IEleosPriceOracle(eleosPriceOracle).getResult(underlying);
         (uint112 reserve0, uint112 reserve1, ) =
@@ -80,12 +80,12 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address from,
         address to,
         uint256 value
-    ) internal {
+    ) internal override {
         require(tokensUnlocked(from, value), "Eleos: INSUFFICIENT_LIQUIDITY");
         super._transfer(from, to, value);
     }
 
-    function tokensUnlocked(address from, uint256 value) public returns (bool) {
+    function tokensUnlocked(address from, uint256 value) public virtual returns (bool) {
         uint256 _balance = balanceOf[from];
         if (value > _balance) return false;
         uint256 finalBalance = _balance - value;
@@ -115,6 +115,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
 
     function accountLiquidity(address borrower)
         public
+        virtual
         returns (uint256 liquidity, uint256 shortfall)
     {
         return accountLiquidityAmounts(borrower, uint256(-1), uint256(-1));
@@ -124,7 +125,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address borrower,
         address borrowable,
         uint256 accountBorrows
-    ) public returns (bool) {
+    ) public virtual returns (bool) {
         address _borrowable0 = borrowable0;
         address _borrowable1 = borrowable1;
         require(

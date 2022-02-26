@@ -22,41 +22,41 @@ contract MockERC20 is IERC20 {
 		_decimals = 18;
 	}
 
-	function name() external view returns (string memory) {
+	function name() external view override returns (string memory) {
 		return _name;
 	}
 
-	function symbol() external view returns (string memory) {
+	function symbol() external view override returns (string memory) {
 		return _symbol;
 	}
 	
-	function decimals() external view returns (uint8) {
+	function decimals() external view override returns (uint8) {
 		return _decimals;
 	}
 
-	function totalSupply() external view returns (uint256) {
+	function totalSupply() external view override returns (uint256) {
 		return _totalSupply;
 	}
 
-	function balanceOf(address account) external view returns (uint256) {
+	function balanceOf(address account) external view override returns (uint256) {
 		return _balances[account];
 	}
 	
-	function transfer(address to, uint256 amount) external returns (bool) {
+	function transfer(address to, uint256 amount) external override returns (bool) {
 		_transfer(msg.sender, to, amount);
 		return true;
 	}
 	
-	function allowance(address owner, address spender) external view returns (uint256) {
+	function allowance(address owner, address spender) external view override returns (uint256) {
 		return _allowances[owner][spender];
 	}
 
-	function approve(address spender, uint256 amount) external returns (bool) {
+	function approve(address spender, uint256 amount) external override returns (bool) {
 		_approve(msg.sender, spender, amount);
 		return true;
 	}
 
-	function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+	function transferFrom(address from, address to, uint256 amount) external override returns (bool) {
 		_transfer(from, to, amount);
 		_approve(from, msg.sender, _allowances[from][msg.sender].sub(amount, "ERC20: transfer amount exceeds allowance"));
 		return true;

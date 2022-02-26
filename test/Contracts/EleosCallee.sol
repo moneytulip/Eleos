@@ -17,7 +17,7 @@ contract EleosCallee is IEleosCallee {
         address borrower,
         uint256 borrowAmount,
         bytes calldata data
-    ) external {
+    ) external override {
         sender;
         borrower;
         borrowAmount;
@@ -29,7 +29,7 @@ contract EleosCallee is IEleosCallee {
         address sender,
         uint256 redeemAmount,
         bytes calldata data
-    ) external {
+    ) external override {
         sender;
         redeemAmount;
         data;

@@ -89,7 +89,7 @@ contract BInterestRateModel is PoolToken, BStorage {
 		emit AccrueInterest(interestAccumulated, _borrowIndex, _totalBorrows);
 	}
 		
-	function getBlockTimestamp() public view returns (uint32) {
+	function getBlockTimestamp() public view virtual returns (uint32) {
 		return uint32(block.timestamp % 2**32);
 	}
 }

@@ -7,7 +7,7 @@ import "../../contracts/interfaces/IEleosPriceOracle.sol";
 contract MockOracle is IEleosPriceOracle {
 	using UQ112x112 for uint224;
 	
-	uint32 public constant MIN_T = 1200;
+	uint32 public constant override MIN_T = 1200;
 	struct Pair {
         uint256 priceCumulativeSlotA;
         uint256 priceCumulativeSlotB;
@@ -16,17 +16,17 @@ contract MockOracle is IEleosPriceOracle {
         bool latestIsSlotA;
         bool initialized;
 	}
-	mapping(address => Pair) public getPair;
+	mapping(address => Pair) public override getPair;
 	
 	mapping(address => uint224) public mockPrice;
 	
-	function initialize(address uniswapV2Pair) external {
+	function initialize(address uniswapV2Pair) external override {
 		require(!getPair[uniswapV2Pair].initialized, "AssertError: pair is already initialized");
 		getPair[uniswapV2Pair].initialized = true;
 		mockPrice[uniswapV2Pair] = 2**112;
 	}
 	
-	function getResult(address uniswapV2Pair) external returns (uint224 price, uint32 T) {
+	function getResult(address uniswapV2Pair) external override returns (uint224 price, uint32 T) {
 		price = mockPrice[uniswapV2Pair];
 		T = 1200;
 	}

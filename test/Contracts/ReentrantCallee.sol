@@ -12,7 +12,7 @@ contract ReentrantCallee is IEleosCallee {
         address borrower,
         uint256 borrowAmount,
         bytes calldata data
-    ) external {
+    ) external override {
         sender;
         borrower;
         borrowAmount;
@@ -32,7 +32,7 @@ contract ReentrantCallee is IEleosCallee {
         address sender,
         uint256 redeemAmount,
         bytes calldata data
-    ) external {
+    ) external override {
         sender;
         redeemAmount;
         address a = address(this);

@@ -10,11 +10,11 @@ import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IEleosPriceOracle.sol";
 
 contract Factory is IFactory {
-    address public admin;
-    address public pendingAdmin;
-    address public reservesAdmin;
-    address public reservesPendingAdmin;
-    address public reservesManager;
+    address public override admin;
+    address public override pendingAdmin;
+    address public override reservesAdmin;
+    address public override reservesPendingAdmin;
+    address public override reservesManager;
 
     struct LendingPool {
         bool initialized;
@@ -94,6 +94,7 @@ contract Factory is IFactory {
 
     function createCollateral(address uniswapV2Pair)
         external
+        override
         returns (address collateral)
     {
         _getTokens(uniswapV2Pair);
@@ -109,6 +110,7 @@ contract Factory is IFactory {
 
     function createBorrowable0(address uniswapV2Pair)
         external
+        override
         returns (address borrowable0)
     {
         _getTokens(uniswapV2Pair);
@@ -124,6 +126,7 @@ contract Factory is IFactory {
 
     function createBorrowable1(address uniswapV2Pair)
         external
+        override
         returns (address borrowable1)
     {
         _getTokens(uniswapV2Pair);

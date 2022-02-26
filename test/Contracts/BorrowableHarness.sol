@@ -20,7 +20,7 @@ contract BorrowableHarness is Borrowable {
 	bool useMockBorrowBalance;
 	mapping(address => uint) public _borrowBalance;
 	
-	function borrowBalance(address borrower) public view returns (uint) {
+	function borrowBalance(address borrower) public view override returns (uint) {
 		if (useMockBorrowBalance) return _borrowBalance[borrower];
 		return super.borrowBalance(borrower);
 	}
@@ -64,7 +64,7 @@ contract BorrowableHarness is Borrowable {
 	}
 	
 	uint32 _blockTimestamp;
-	function getBlockTimestamp() public view returns (uint32) {
+	function getBlockTimestamp() public view override returns (uint32) {
 		return _blockTimestamp;
 	}
 	function setBlockTimestamp(uint blockTimestamp) public {

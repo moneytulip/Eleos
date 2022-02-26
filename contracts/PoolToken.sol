@@ -7,10 +7,10 @@ import "./libraries/SafeMath.sol";
 
 contract PoolToken is IPoolToken, EleosERC20 {
     uint256 internal constant initialExchangeRate = 1e18;
-    address public underlying;
-    address public factory;
-    uint256 public totalBalance;
-    uint256 public constant MINIMUM_LIQUIDITY = 1000;
+    address public override underlying;
+    address public override factory;
+    uint256 public override totalBalance;
+    uint256 public constant override MINIMUM_LIQUIDITY = 1000;
 
     event Mint(
         address indexed sender,
@@ -29,7 +29,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
     /*** Initialize ***/
 
     // called once by the factory
-    function _setFactory() external {
+    function _setFactory() external override {
         require(factory == address(0), "Eleos: FACTORY_ALREADY_SET");
         factory = msg.sender;
     }
@@ -41,7 +41,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
         emit Sync(totalBalance);
     }
 
-    function exchangeRate() public returns (uint256) {
+    function exchangeRate() public override returns (uint256) {
         uint256 _totalSupply = totalSupply; // gas savings
         uint256 _totalBalance = totalBalance; // gas savings
         if (_totalSupply == 0 || _totalBalance == 0) return initialExchangeRate;
@@ -53,6 +53,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
         external
         nonReentrant
         update
+        override
         returns (uint256 mintTokens)
     {
         uint256 balance = IERC20(underlying).balanceOf(address(this));
@@ -74,6 +75,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
         external
         nonReentrant
         update
+        override
         returns (uint256 redeemAmount)
     {
         uint256 redeemTokens = balanceOf[address(this)];
@@ -87,7 +89,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
     }
 
     // force real balance to match totalBalance
-    function skim(address to) external nonReentrant {
+    function skim(address to) external override nonReentrant {
         _safeTransfer(
             to,
             IERC20(underlying).balanceOf(address(this)).sub(totalBalance)
@@ -95,7 +97,7 @@ contract PoolToken is IPoolToken, EleosERC20 {
     }
 
     // force totalBalance to match real balance
-    function sync() external nonReentrant update {}
+    function sync() external nonReentrant override update {}
 
     /*** Utilities ***/
 
