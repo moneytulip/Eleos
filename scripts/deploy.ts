@@ -12,7 +12,7 @@ async function main() {
   logContractDeploy("bDeployer", bDeployer);
   logContractDeploy("cDeployer", cDeployer);
 
-  const tarotFactory = await (
+  const eleosFactory = await (
     await ethers.getContractFactory("Factory")
   ).deploy(
     process.env.ADMIN_ADDRESS,
@@ -22,13 +22,13 @@ async function main() {
     process.env.PRICE_ORACLE_ADDRESS
   );
 
-  logContractDeploy("factory", tarotFactory);
+  logContractDeploy("factory", eleosFactory);
 
   console.log("Awaiting deployment...");
 
   await bDeployer.deployed();
   await cDeployer.deployed();
-  await tarotFactory.deployed();
+  await eleosFactory.deployed();
 
   console.log("Finished");
 }

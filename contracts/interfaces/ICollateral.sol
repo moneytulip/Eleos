@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0;
 
 interface ICollateral {
-    /*** Tarot ERC20 ***/
+    /*** Eleos ERC20 ***/
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(
@@ -93,7 +93,7 @@ interface ICollateral {
 
     function borrowable1() external view returns (address);
 
-    function tarotPriceOracle() external view returns (address);
+    function eleosPriceOracle() external view returns (address);
 
     function safetyMarginSqrt() external view returns (uint256);
 

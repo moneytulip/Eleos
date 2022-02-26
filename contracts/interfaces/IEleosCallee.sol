@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0;
 
-interface ITarotCallee {
+interface IEleosCallee {
     function tarotBorrow(
         address sender,
         address borrower,

@@ -7,7 +7,7 @@ import "./interfaces/ICDeployer.sol";
 import "./interfaces/ICollateral.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IUniswapV2Pair.sol";
-import "./interfaces/ITarotPriceOracle.sol";
+import "./interfaces/IEleosPriceOracle.sol";
 
 contract Factory is IFactory {
     address public admin;
@@ -32,7 +32,7 @@ contract Factory is IFactory {
 
     IBDeployer public bDeployer;
     ICDeployer public cDeployer;
-    ITarotPriceOracle public tarotPriceOracle;
+    IEleosPriceOracle public eleosPriceOracle;
 
     event LendingPoolInitialized(
         address indexed uniswapV2Pair,
@@ -60,13 +60,13 @@ contract Factory is IFactory {
         address _reservesAdmin,
         IBDeployer _bDeployer,
         ICDeployer _cDeployer,
-        ITarotPriceOracle _tarotPriceOracle
+        IEleosPriceOracle _eleosPriceOracle
     ) public {
         admin = _admin;
         reservesAdmin = _reservesAdmin;
         bDeployer = _bDeployer;
         cDeployer = _cDeployer;
-        tarotPriceOracle = _tarotPriceOracle;
+        eleosPriceOracle = _eleosPriceOracle;
         emit NewAdmin(address(0), _admin);
         emit NewReservesAdmin(address(0), _reservesAdmin);
     }
@@ -99,7 +99,7 @@ contract Factory is IFactory {
         _getTokens(uniswapV2Pair);
         require(
             getLendingPool[uniswapV2Pair].collateral == address(0),
-            "Tarot: ALREADY_EXISTS"
+            "Eleos: ALREADY_EXISTS"
         );
         collateral = cDeployer.deployCollateral(uniswapV2Pair);
         ICollateral(collateral)._setFactory();
@@ -114,7 +114,7 @@ contract Factory is IFactory {
         _getTokens(uniswapV2Pair);
         require(
             getLendingPool[uniswapV2Pair].borrowable0 == address(0),
-            "Tarot: ALREADY_EXISTS"
+            "Eleos: ALREADY_EXISTS"
         );
         borrowable0 = bDeployer.deployBorrowable(uniswapV2Pair, 0);
         IBorrowable(borrowable0)._setFactory();
@@ -129,7 +129,7 @@ contract Factory is IFactory {
         _getTokens(uniswapV2Pair);
         require(
             getLendingPool[uniswapV2Pair].borrowable1 == address(0),
-            "Tarot: ALREADY_EXISTS"
+            "Eleos: ALREADY_EXISTS"
         );
         borrowable1 = bDeployer.deployBorrowable(uniswapV2Pair, 1);
         IBorrowable(borrowable1)._setFactory();
@@ -140,41 +140,41 @@ contract Factory is IFactory {
     function initializeLendingPool(address uniswapV2Pair) external {
         (address token0, address token1) = _getTokens(uniswapV2Pair);
         LendingPool memory lPool = getLendingPool[uniswapV2Pair];
-        require(!lPool.initialized, "Tarot: ALREADY_INITIALIZED");
+        require(!lPool.initialized, "Eleos: ALREADY_INITIALIZED");
 
         require(
             lPool.collateral != address(0),
-            "Tarot: COLLATERALIZABLE_NOT_CREATED"
+            "Eleos: COLLATERALIZABLE_NOT_CREATED"
         );
         require(
             lPool.borrowable0 != address(0),
-            "Tarot: BORROWABLE0_NOT_CREATED"
+            "Eleos: BORROWABLE0_NOT_CREATED"
         );
         require(
             lPool.borrowable1 != address(0),
-            "Tarot: BORROWABLE1_NOT_CREATED"
+            "Eleos: BORROWABLE1_NOT_CREATED"
         );
 
         (, , , , , bool oracleInitialized) =
-            tarotPriceOracle.getPair(uniswapV2Pair);
-        if (!oracleInitialized) tarotPriceOracle.initialize(uniswapV2Pair);
+            eleosPriceOracle.getPair(uniswapV2Pair);
+        if (!oracleInitialized) eleosPriceOracle.initialize(uniswapV2Pair);
 
         ICollateral(lPool.collateral)._initialize(
-            "Tarot Collateral",
-            "cTAROT",
+            "Eleos Collateral",
+            "cELEOS",
             uniswapV2Pair,
             lPool.borrowable0,
             lPool.borrowable1
         );
         IBorrowable(lPool.borrowable0)._initialize(
-            "Tarot Borrowable",
-            "bTAROT",
+            "Eleos Borrowable",
+            "bELEOS",
             token0,
             lPool.collateral
         );
         IBorrowable(lPool.borrowable1)._initialize(
-            "Tarot Borrowable",
-            "bTAROT",
+            "Eleos Borrowable",
+            "bELEOS",
             token1,
             lPool.collateral
         );
@@ -192,14 +192,14 @@ contract Factory is IFactory {
     }
 
     function _setPendingAdmin(address newPendingAdmin) external {
-        require(msg.sender == admin, "Tarot: UNAUTHORIZED");
+        require(msg.sender == admin, "Eleos: UNAUTHORIZED");
         address oldPendingAdmin = pendingAdmin;
         pendingAdmin = newPendingAdmin;
         emit NewPendingAdmin(oldPendingAdmin, newPendingAdmin);
     }
 
     function _acceptAdmin() external {
-        require(msg.sender == pendingAdmin, "Tarot: UNAUTHORIZED");
+        require(msg.sender == pendingAdmin, "Eleos: UNAUTHORIZED");
         address oldAdmin = admin;
         address oldPendingAdmin = pendingAdmin;
         admin = pendingAdmin;
@@ -211,7 +211,7 @@ contract Factory is IFactory {
     function _setReservesPendingAdmin(address newReservesPendingAdmin)
         external
     {
-        require(msg.sender == reservesAdmin, "Tarot: UNAUTHORIZED");
+        require(msg.sender == reservesAdmin, "Eleos: UNAUTHORIZED");
         address oldReservesPendingAdmin = reservesPendingAdmin;
         reservesPendingAdmin = newReservesPendingAdmin;
         emit NewReservesPendingAdmin(
@@ -221,7 +221,7 @@ contract Factory is IFactory {
     }
 
     function _acceptReservesAdmin() external {
-        require(msg.sender == reservesPendingAdmin, "Tarot: UNAUTHORIZED");
+        require(msg.sender == reservesPendingAdmin, "Eleos: UNAUTHORIZED");
         address oldReservesAdmin = reservesAdmin;
         address oldReservesPendingAdmin = reservesPendingAdmin;
         reservesAdmin = reservesPendingAdmin;
@@ -231,7 +231,7 @@ contract Factory is IFactory {
     }
 
     function _setReservesManager(address newReservesManager) external {
-        require(msg.sender == reservesAdmin, "Tarot: UNAUTHORIZED");
+        require(msg.sender == reservesAdmin, "Eleos: UNAUTHORIZED");
         address oldReservesManager = reservesManager;
         reservesManager = newReservesManager;
         emit NewReservesManager(oldReservesManager, newReservesManager);

@@ -23,7 +23,7 @@ contract BSetter is PoolToken, BStorage {
         address _underlying,
         address _collateral
     ) external {
-        require(msg.sender == factory, "Tarot: UNAUTHORIZED"); // sufficient check
+        require(msg.sender == factory, "Eleos: UNAUTHORIZED"); // sufficient check
         _setName(_name, _symbol);
         underlying = _underlying;
         collateral = _collateral;
@@ -63,11 +63,11 @@ contract BSetter is PoolToken, BStorage {
         uint256 max
     ) internal view {
         _checkAdmin();
-        require(parameter >= min, "Tarot: INVALID_SETTING");
-        require(parameter <= max, "Tarot: INVALID_SETTING");
+        require(parameter >= min, "Eleos: INVALID_SETTING");
+        require(parameter <= max, "Eleos: INVALID_SETTING");
     }
 
     function _checkAdmin() internal view {
-        require(msg.sender == IFactory(factory).admin(), "Tarot: UNAUTHORIZED");
+        require(msg.sender == IFactory(factory).admin(), "Eleos: UNAUTHORIZED");
     }
 }

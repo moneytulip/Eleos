@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0;
 
 interface IPoolToken {
-    /*** Tarot ERC20 ***/
+    /*** Eleos ERC20 ***/
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(

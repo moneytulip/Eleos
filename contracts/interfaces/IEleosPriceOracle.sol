@@ -1,6 +1,6 @@
 pragma solidity >=0.5.0;
 
-interface ITarotPriceOracle {
+interface IEleosPriceOracle {
     event PriceUpdate(
         address indexed pair,
         uint256 priceCumulative,

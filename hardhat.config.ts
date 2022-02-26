@@ -20,24 +20,24 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
     hardhat: {},
-    fantom: {
-      chainId: 250,
-      url: 'https://rpcapi.fantom.network',
-      accounts: {
-        mnemonic: process.env.MNEMONIC
-      }
-    },
-    fantomtestnet: {
-      chainId: 4002,
-      url: 'https://rpc.testnet.fantom.network',
-      accounts: {
-        mnemonic: process.env.MNEMONIC
-      }
-    }
+    // fantom: {
+    //   chainId: 250,
+    //   url: 'https://rpcapi.fantom.network',
+    //   accounts: {
+    //     mnemonic: process.env.MNEMONIC
+    //   }
+    // },
+    // fantomtestnet: {
+    //   chainId: 4002,
+    //   url: 'https://rpc.testnet.fantom.network',
+    //   accounts: {
+    //     mnemonic: process.env.MNEMONIC
+    //   }
+    // }
   },
-  etherscan: {
-    apiKey: process.env.FTMSCAN_API_KEY
-  }
+  // etherscan: {
+  //   apiKey: process.env.FTMSCAN_API_KEY
+  // }
 };
 
 export default config;

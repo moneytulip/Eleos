@@ -5,7 +5,7 @@ import "./libraries/SafeMath.sol";
 // This contract is basically UniswapV2ERC20 with small modifications
 // src: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol
 
-contract TarotERC20 {
+contract EleosERC20 {
     using SafeMath for uint256;
 
     string public name;

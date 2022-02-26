@@ -3,7 +3,7 @@ pragma solidity =0.5.16;
 import "./CStorage.sol";
 import "./PoolToken.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/ITarotPriceOracle.sol";
+import "./interfaces/IEleosPriceOracle.sol";
 
 contract CSetter is PoolToken, CStorage {
     uint256 public constant SAFETY_MARGIN_SQRT_MIN = 1.00e18; //safetyMargin: 100%
@@ -22,12 +22,12 @@ contract CSetter is PoolToken, CStorage {
         address _borrowable0,
         address _borrowable1
     ) external {
-        require(msg.sender == factory, "Tarot: UNAUTHORIZED"); // sufficient check
+        require(msg.sender == factory, "Eleos: UNAUTHORIZED"); // sufficient check
         _setName(_name, _symbol);
         underlying = _underlying;
         borrowable0 = _borrowable0;
         borrowable1 = _borrowable1;
-        tarotPriceOracle = IFactory(factory).tarotPriceOracle();
+        eleosPriceOracle = IFactory(factory).eleosPriceOracle();
     }
 
     function _setSafetyMarginSqrt(uint256 newSafetyMarginSqrt)
@@ -62,11 +62,11 @@ contract CSetter is PoolToken, CStorage {
         uint256 max
     ) internal view {
         _checkAdmin();
-        require(parameter >= min, "Tarot: INVALID_SETTING");
-        require(parameter <= max, "Tarot: INVALID_SETTING");
+        require(parameter >= min, "Eleos: INVALID_SETTING");
+        require(parameter <= max, "Eleos: INVALID_SETTING");
     }
 
     function _checkAdmin() internal view {
-        require(msg.sender == IFactory(factory).admin(), "Tarot: UNAUTHORIZED");
+        require(msg.sender == IFactory(factory).admin(), "Eleos: UNAUTHORIZED");
     }
 }

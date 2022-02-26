@@ -6,8 +6,8 @@ import "./CSetter.sol";
 import "./interfaces/IBorrowable.sol";
 import "./interfaces/ICollateral.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/ITarotPriceOracle.sol";
-import "./interfaces/ITarotCallee.sol";
+import "./interfaces/IEleosPriceOracle.sol";
+import "./interfaces/IEleosCallee.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/UQ112x112.sol";
 import "./libraries/Math.sol";
@@ -22,7 +22,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     // returns the prices of borrowable0's and borrowable1's underlyings with collateral's underlying as denom
     function getPrices() public returns (uint256 price0, uint256 price1) {
         (uint224 twapPrice112x112, ) =
-            ITarotPriceOracle(tarotPriceOracle).getResult(underlying);
+            IEleosPriceOracle(eleosPriceOracle).getResult(underlying);
         (uint112 reserve0, uint112 reserve1, ) =
             IUniswapV2Pair(underlying).getReserves();
         uint256 collateralTotalSupply =
@@ -47,8 +47,8 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
          * reserve0 / reserve1 is close to 2**112 or 1/2**112
          * We're going to prevent users from using pairs at risk from the UI
          */
-        require(price0 > 100, "Tarot: PRICE_CALCULATION_ERROR");
-        require(price1 > 100, "Tarot: PRICE_CALCULATION_ERROR");
+        require(price0 > 100, "Eleos: PRICE_CALCULATION_ERROR");
+        require(price1 > 100, "Eleos: PRICE_CALCULATION_ERROR");
     }
 
     // returns liquidity in  collateral's underlying
@@ -81,7 +81,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address to,
         uint256 value
     ) internal {
-        require(tokensUnlocked(from, value), "Tarot: INSUFFICIENT_LIQUIDITY");
+        require(tokensUnlocked(from, value), "Eleos: INSUFFICIENT_LIQUIDITY");
         super._transfer(from, to, value);
     }
 
@@ -129,7 +129,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address _borrowable1 = borrowable1;
         require(
             borrowable == _borrowable0 || borrowable == _borrowable1,
-            "Tarot: INVALID_BORROWABLE"
+            "Eleos: INVALID_BORROWABLE"
         );
         uint256 amount0 =
             borrowable == _borrowable0 ? accountBorrows : uint256(-1);
@@ -148,11 +148,11 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     ) external returns (uint256 seizeTokens) {
         require(
             msg.sender == borrowable0 || msg.sender == borrowable1,
-            "Tarot: UNAUTHORIZED"
+            "Eleos: UNAUTHORIZED"
         );
 
         (, uint256 shortfall) = accountLiquidity(borrower);
-        require(shortfall > 0, "Tarot: INSUFFICIENT_SHORTFALL");
+        require(shortfall > 0, "Eleos: INSUFFICIENT_SHORTFALL");
 
         uint256 price;
         if (msg.sender == borrowable0) (price, ) = getPrices();
@@ -166,7 +166,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
 
         balanceOf[borrower] = balanceOf[borrower].sub(
             seizeTokens,
-            "Tarot: LIQUIDATING_TOO_MUCH"
+            "Eleos: LIQUIDATING_TOO_MUCH"
         );
         balanceOf[liquidator] = balanceOf[liquidator].add(seizeTokens);
         emit Transfer(borrower, liquidator, seizeTokens);
@@ -178,19 +178,19 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         uint256 redeemAmount,
         bytes calldata data
     ) external nonReentrant update {
-        require(redeemAmount <= totalBalance, "Tarot: INSUFFICIENT_CASH");
+        require(redeemAmount <= totalBalance, "Eleos: INSUFFICIENT_CASH");
 
         // optimistically transfer funds
         _safeTransfer(redeemer, redeemAmount);
         if (data.length > 0)
-            ITarotCallee(redeemer).tarotRedeem(msg.sender, redeemAmount, data);
+            IEleosCallee(redeemer).eleosRedeem(msg.sender, redeemAmount, data);
 
         uint256 redeemTokens = balanceOf[address(this)];
         uint256 declaredRedeemTokens =
             redeemAmount.mul(1e18).div(exchangeRate()).add(1); // rounded up
         require(
             redeemTokens >= declaredRedeemTokens,
-            "Tarot: INSUFFICIENT_REDEEM_TOKENS"
+            "Eleos: INSUFFICIENT_REDEEM_TOKENS"
         );
 
         _burn(address(this), redeemTokens);

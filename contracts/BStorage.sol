@@ -29,7 +29,7 @@ contract BStorage {
     address public borrowTracker;
 
     function safe112(uint256 n) internal pure returns (uint112) {
-        require(n < 2**112, "Tarot: SAFE112");
+        require(n < 2**112, "Eleos: SAFE112");
         return uint112(n);
     }
 }
