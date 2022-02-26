@@ -45,7 +45,7 @@ contract('BAllowance', function (accounts) {
 	});
 	
 	beforeEach(async () => {
-		token = await BAllowance.new("Eleos", "TAROT");
+		token = await BAllowance.new("Eleos", "ELEOS");
 	});
 	
 	it('borrowApprove', async () => {

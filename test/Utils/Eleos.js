@@ -69,7 +69,7 @@ async function makeEleosPriceOracle(opts = {}) {
 	return await MockOracle.new();
 }
 
-//TAROT DEPLOYER
+//ELEOS DEPLOYER
 
 async function makeBDeployer(opts = {}) {
 	return await BDeployer.new();
