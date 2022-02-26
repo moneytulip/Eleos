@@ -75,7 +75,7 @@ contract EleosERC20 {
     ) internal {
         balanceOf[from] = balanceOf[from].sub(
             value,
-            "Tarot: TRANSFER_TOO_HIGH"
+            "Eleos: TRANSFER_TOO_HIGH"
         );
         balanceOf[to] = balanceOf[to].add(value);
         emit Transfer(from, to, value);
@@ -99,7 +99,7 @@ contract EleosERC20 {
         if (allowance[from][msg.sender] != uint256(-1)) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value,
-                "Tarot: TRANSFER_NOT_ALLOWED"
+                "Eleos: TRANSFER_NOT_ALLOWED"
             );
         }
         _transfer(from, to, value);
@@ -116,7 +116,7 @@ contract EleosERC20 {
         bytes32 s,
         bytes32 typehash
     ) internal {
-        require(deadline >= block.timestamp, "Tarot: EXPIRED");
+        require(deadline >= block.timestamp, "Eleos: EXPIRED");
         bytes32 digest =
             keccak256(
                 abi.encodePacked(
@@ -137,7 +137,7 @@ contract EleosERC20 {
         address recoveredAddress = ecrecover(digest, v, r, s);
         require(
             recoveredAddress != address(0) && recoveredAddress == owner,
-            "Tarot: INVALID_SIGNATURE"
+            "Eleos: INVALID_SIGNATURE"
         );
     }
 

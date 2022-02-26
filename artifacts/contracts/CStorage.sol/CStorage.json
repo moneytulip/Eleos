@@ -1,0 +1,86 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "CStorage",
+  "sourceName": "contracts/CStorage.sol",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "borrowable0",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "borrowable1",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "eleosPriceOracle",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "liquidationIncentive",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "safetyMarginSqrt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60806040526715f155637eba0c00600355670e6ed27d6668000060045534801561002857600080fd5b5061010f806100386000396000f3fe6080604052348015600f57600080fd5b506004361060505760003560e01c80632fa5ae1b146055578063356c571f1460775780633a54a2ae14608f5780638c765e94146095578063daf8881814609b575b600080fd5b605b60a1565b604080516001600160a01b039092168252519081900360200190f35b607d60b0565b60408051918252519081900360200190f35b605b60b6565b607d60c5565b605b60cb565b6000546001600160a01b031681565b60035481565b6002546001600160a01b031681565b60045481565b6001546001600160a01b03168156fea265627a7a72315820029c336bea2a325bbef82d229289ed11c13d3360f3547b3ff438e2584769137164736f6c63430005100032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060505760003560e01c80632fa5ae1b146055578063356c571f1460775780633a54a2ae14608f5780638c765e94146095578063daf8881814609b575b600080fd5b605b60a1565b604080516001600160a01b039092168252519081900360200190f35b607d60b0565b60408051918252519081900360200190f35b605b60b6565b607d60c5565b605b60cb565b6000546001600160a01b031681565b60035481565b6002546001600160a01b031681565b60045481565b6001546001600160a01b03168156fea265627a7a72315820029c336bea2a325bbef82d229289ed11c13d3360f3547b3ff438e2584769137164736f6c63430005100032",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

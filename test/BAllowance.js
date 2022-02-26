@@ -3,7 +3,7 @@ const {
 	getDomainSeparator,
 	getApprovalDigest,
 	sendBorrowPermit,
-} = require('./Utils/Tarot');
+} = require('./Utils/Eleos');
 const {
 	expectEqual,
 	expectRevert,
@@ -45,7 +45,7 @@ contract('BAllowance', function (accounts) {
 	});
 	
 	beforeEach(async () => {
-		token = await BAllowance.new("Tarot", "TAROT");
+		token = await BAllowance.new("Eleos", "TAROT");
 	});
 	
 	it('borrowApprove', async () => {
@@ -72,9 +72,9 @@ contract('BAllowance', function (accounts) {
 
 	it('checkBorrowAllowance fail', async () => {
 		expectEqual(await token.borrowAllowance(user, other), 0);
-		await expectRevert(token.checkBorrowAllowance(user, other, TEST_AMOUNT), "Tarot: BORROW_NOT_ALLOWED");
+		await expectRevert(token.checkBorrowAllowance(user, other, TEST_AMOUNT), "Eleos: BORROW_NOT_ALLOWED");
 		await token.borrowApprove(other, TEST_AMOUNT, {from: user});
-		await expectRevert(token.checkBorrowAllowance(user, other, TEST_AMOUNT.add(new BN(1))), "Tarot: BORROW_NOT_ALLOWED");
+		await expectRevert(token.checkBorrowAllowance(user, other, TEST_AMOUNT.add(new BN(1))), "Eleos: BORROW_NOT_ALLOWED");
 		await token.checkBorrowAllowance(user, other, TEST_AMOUNT);
 	});
 	
@@ -111,7 +111,7 @@ contract('BAllowance', function (accounts) {
 				value: TEST_AMOUNT,
 				deadline: MAX_UINT_256,
 				private_key: otherForEip712PK,
-			}), 'Tarot: INVALID_SIGNATURE'
+			}), 'Eleos: INVALID_SIGNATURE'
 		);				
 		await expectRevert(
 			sendBorrowPermit({
@@ -121,7 +121,7 @@ contract('BAllowance', function (accounts) {
 				value: TEST_AMOUNT,
 				deadline: new BN(1577836800), //jan 1, 2020
 				private_key: userForEip712PK,
-			}), 'Tarot: EXPIRED'
+			}), 'Eleos: EXPIRED'
 		);
 	});
 });

@@ -2,9 +2,9 @@ pragma solidity =0.5.16;
 
 import "../../contracts/libraries/UQ112x112.sol";
 import "../../contracts/interfaces/IUniswapV2Pair.sol";
-import "../../contracts/interfaces/ITarotPriceOracle.sol";
+import "../../contracts/interfaces/IEleosPriceOracle.sol";
 
-contract MockOracle is ITarotPriceOracle {
+contract MockOracle is IEleosPriceOracle {
 	using UQ112x112 for uint224;
 	
 	uint32 public constant MIN_T = 1200;

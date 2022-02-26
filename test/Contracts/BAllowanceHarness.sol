@@ -5,7 +5,7 @@ import "../../contracts/BAllowance.sol";
 contract BAllowanceHarness is BAllowance {
     constructor(string memory _name, string memory _symbol)
         public
-        TarotERC20()
+        EleosERC20()
     {
         _setName(_name, _symbol);
     }

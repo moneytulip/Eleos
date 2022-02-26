@@ -1,6 +1,6 @@
 const {
 	makePoolToken,
-} = require('./Utils/Tarot');
+} = require('./Utils/Eleos');
 const {
 	expectEqual,
 	expectEvent,

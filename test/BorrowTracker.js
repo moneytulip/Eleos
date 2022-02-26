@@ -1,7 +1,7 @@
 const {
 	Borrowable,
 	MockBorrowTracker,
-} = require('./Utils/Tarot');
+} = require('./Utils/Eleos');
 const {
 	expectAlmostEqualMantissa,
 	expectRevert,

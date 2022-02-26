@@ -2,12 +2,12 @@ pragma solidity =0.5.16;
 
 import "../../contracts/interfaces/IBorrowable.sol";
 import "../../contracts/interfaces/ICollateral.sol";
-import "../../contracts/interfaces/ITarotCallee.sol";
+import "../../contracts/interfaces/IEleosCallee.sol";
 
-contract ReentrantCallee is ITarotCallee {
+contract ReentrantCallee is IEleosCallee {
     constructor() public {}
 
-    function tarotBorrow(
+    function eleosBorrow(
         address sender,
         address borrower,
         uint256 borrowAmount,
@@ -28,7 +28,7 @@ contract ReentrantCallee is ITarotCallee {
         else if (i == 7) IBorrowable(msg.sender).underlying();
     }
 
-    function tarotRedeem(
+    function eleosRedeem(
         address sender,
         uint256 redeemAmount,
         bytes calldata data

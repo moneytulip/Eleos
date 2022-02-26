@@ -1,6 +1,6 @@
 const {
 	BInterestRateModel,
-} = require('./Utils/Tarot');
+} = require('./Utils/Eleos');
 const {
 	expectAlmostEqualMantissa,
 	expectEvent,

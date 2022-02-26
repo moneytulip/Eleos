@@ -1,0 +1,200 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "MockOracle",
+  "sourceName": "test/Contracts/MockOracle.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "pair",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "priceCumulative",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "blockTimestamp",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "latestIsSlotA",
+          "type": "bool"
+        }
+      ],
+      "name": "PriceUpdate",
+      "type": "event"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "MIN_T",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getBlockTimestamp",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "getPair",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "priceCumulativeSlotA",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "priceCumulativeSlotB",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint32",
+          "name": "lastUpdateSlotA",
+          "type": "uint32"
+        },
+        {
+          "internalType": "uint32",
+          "name": "lastUpdateSlotB",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bool",
+          "name": "latestIsSlotA",
+          "type": "bool"
+        },
+        {
+          "internalType": "bool",
+          "name": "initialized",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "uniswapV2Pair",
+          "type": "address"
+        }
+      ],
+      "name": "getResult",
+      "outputs": [
+        {
+          "internalType": "uint224",
+          "name": "price",
+          "type": "uint224"
+        },
+        {
+          "internalType": "uint32",
+          "name": "T",
+          "type": "uint32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "uniswapV2Pair",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "mockPrice",
+      "outputs": [
+        {
+          "internalType": "uint224",
+          "name": "",
+          "type": "uint224"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "uniswapV2Pair",
+          "type": "address"
+        },
+        {
+          "internalType": "uint224",
+          "name": "price",
+          "type": "uint224"
+        }
+      ],
+      "name": "setPrice",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506103e5806100206000396000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80639a2a7b7d1161005b5780639a2a7b7d14610155578063c4d66de81461018c578063e102c996146101b2578063f51b5531146101f45761007d565b80631a788a0214610082578063446a37e0146100e6578063796b89b914610134575b600080fd5b6100a86004803603602081101561009857600080fd5b50356001600160a01b03166101fc565b60408051968752602087019590955263ffffffff938416868601529190921660608501529015156080840152151560a0830152519081900360c00190f35b61010c600480360360208110156100fc57600080fd5b50356001600160a01b031661024b565b604080516001600160e01b03909316835263ffffffff90911660208301528051918290030190f35b61013c610273565b6040805163ffffffff9092168252519081900360200190f35b61018a6004803603604081101561016b57600080fd5b5080356001600160a01b031690602001356001600160e01b031661027d565b005b61018a600480360360208110156101a257600080fd5b50356001600160a01b03166102b6565b6101d8600480360360208110156101c857600080fd5b50356001600160a01b0316610367565b604080516001600160e01b039092168252519081900360200190f35b61013c610382565b60006020819052908152604090208054600182015460029092015490919063ffffffff8082169164010000000081049091169060ff680100000000000000008204811691600160481b90041686565b6001600160a01b03166000908152600160205260409020546001600160e01b0316906104b090565b63ffffffff421690565b6001600160a01b0391909116600090815260016020526040902080546001600160e01b0319166001600160e01b03909216919091179055565b6001600160a01b038116600090815260208190526040902060020154600160481b900460ff16156103185760405162461bcd60e51b81526004018080602001828103825260288152602001806103896028913960400191505060405180910390fd5b6001600160a01b0316600090815260208181526040808320600201805469ff0000000000000000001916600160481b1790556001909152902080546001600160e01b031916600160701b179055565b6001602052600090815260409020546001600160e01b031681565b6104b08156fe4173736572744572726f723a207061697220697320616c726561647920696e697469616c697a6564a265627a7a723158206fad35a1067b96e5cd00ae1eda5aa533e42897eb330a6b22b30d700160e2df8664736f6c63430005100032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c80639a2a7b7d1161005b5780639a2a7b7d14610155578063c4d66de81461018c578063e102c996146101b2578063f51b5531146101f45761007d565b80631a788a0214610082578063446a37e0146100e6578063796b89b914610134575b600080fd5b6100a86004803603602081101561009857600080fd5b50356001600160a01b03166101fc565b60408051968752602087019590955263ffffffff938416868601529190921660608501529015156080840152151560a0830152519081900360c00190f35b61010c600480360360208110156100fc57600080fd5b50356001600160a01b031661024b565b604080516001600160e01b03909316835263ffffffff90911660208301528051918290030190f35b61013c610273565b6040805163ffffffff9092168252519081900360200190f35b61018a6004803603604081101561016b57600080fd5b5080356001600160a01b031690602001356001600160e01b031661027d565b005b61018a600480360360208110156101a257600080fd5b50356001600160a01b03166102b6565b6101d8600480360360208110156101c857600080fd5b50356001600160a01b0316610367565b604080516001600160e01b039092168252519081900360200190f35b61013c610382565b60006020819052908152604090208054600182015460029092015490919063ffffffff8082169164010000000081049091169060ff680100000000000000008204811691600160481b90041686565b6001600160a01b03166000908152600160205260409020546001600160e01b0316906104b090565b63ffffffff421690565b6001600160a01b0391909116600090815260016020526040902080546001600160e01b0319166001600160e01b03909216919091179055565b6001600160a01b038116600090815260208190526040902060020154600160481b900460ff16156103185760405162461bcd60e51b81526004018080602001828103825260288152602001806103896028913960400191505060405180910390fd5b6001600160a01b0316600090815260208181526040808320600201805469ff0000000000000000001916600160481b1790556001909152902080546001600160e01b031916600160701b179055565b6001602052600090815260409020546001600160e01b031681565b6104b08156fe4173736572744572726f723a207061697220697320616c726561647920696e697469616c697a6564a265627a7a723158206fad35a1067b96e5cd00ae1eda5aa533e42897eb330a6b22b30d700160e2df8664736f6c63430005100032",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

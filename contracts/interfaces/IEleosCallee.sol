@@ -1,14 +1,14 @@
 pragma solidity >=0.5.0;
 
 interface IEleosCallee {
-    function tarotBorrow(
+    function eleosBorrow(
         address sender,
         address borrower,
         uint256 borrowAmount,
         bytes calldata data
     ) external;
 
-    function tarotRedeem(
+    function eleosRedeem(
         address sender,
         uint256 redeemAmount,
         bytes calldata data
