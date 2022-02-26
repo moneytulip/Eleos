@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity =0.6.6;
 
 import "./EleosERC20.sol";
 import "./interfaces/IERC20.sol";

@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity =0.6.6;
 
 import "../../contracts/libraries/UQ112x112.sol";
 import "../../contracts/interfaces/IUniswapV2Pair.sol";

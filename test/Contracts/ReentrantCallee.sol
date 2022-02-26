@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity =0.6.6;
 
 import "../../contracts/interfaces/IBorrowable.sol";
 import "../../contracts/interfaces/ICollateral.sol";

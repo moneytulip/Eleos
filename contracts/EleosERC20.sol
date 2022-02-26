@@ -1,4 +1,4 @@
-pragma solidity =0.5.16;
+pragma solidity =0.6.6;
 
 import "./libraries/SafeMath.sol";
 
@@ -32,7 +32,7 @@ contract EleosERC20 {
         symbol = _symbol;
         uint256 chainId;
         assembly {
-            chainId := chainid
+            chainId := chainid()
         }
         DOMAIN_SEPARATOR = keccak256(
             abi.encode(
