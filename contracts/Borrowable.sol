@@ -95,6 +95,7 @@ contract Borrowable is
         public
         view
         virtual
+        override
         returns (uint256)
     {
         BorrowSnapshot memory borrowSnapshot = borrowBalances[borrower];
@@ -173,7 +174,7 @@ contract Borrowable is
         address receiver,
         uint256 borrowAmount,
         bytes calldata data
-    ) external nonReentrant update accrue {
+    ) external override nonReentrant update accrue {
         uint256 _totalBalance = totalBalance;
         require(borrowAmount <= _totalBalance, "Eleos: INSUFFICIENT_CASH");
         _checkBorrowAllowance(borrower, msg.sender, borrowAmount);

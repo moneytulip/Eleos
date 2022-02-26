@@ -2,7 +2,7 @@ pragma solidity >=0.5.0;
 
 import "./IPoolToken.sol";
 
-interface ICollateral {
+interface ICollateral is IPoolToken {
     /*** Collateral ***/
 
     function borrowable0() external view returns (address);

@@ -96,6 +96,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     function tokensUnlocked(address from, uint256 value)
         public
         virtual
+        override
         returns (bool)
     {
         uint256 _balance = balanceOf[from];
@@ -118,7 +119,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address borrower,
         uint256 amount0,
         uint256 amount1
-    ) public returns (uint256 liquidity, uint256 shortfall) {
+    ) public override returns (uint256 liquidity, uint256 shortfall) {
         if (amount0 == uint256(-1))
             amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
         if (amount1 == uint256(-1))
