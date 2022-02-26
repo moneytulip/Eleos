@@ -7,6 +7,12 @@ Many design choices used in the Eleos Protocol stem from Impermax and UniswapV2.
 - [Impermax x Uniswap V2 Whitepaper](https://impermax.finance/Whitepaper-Impermax-UniswapV2.pdf 'Impermax x Uniswap V2 Whitepaper'): this document explains the scope and the components of Impermax from a high level perspective.
 - [UniswapV2 Whitepaper](https://uniswap.org/whitepaper.pdf 'UniswapV2 Whitepaper'): this document explains some design choices made while implementing UniswapV2.
 
+## Local Deployment
+npx hardhat run scripts/deployOracle.ts --network localhost
+// Add to a .env or export addrs
+npx hardhat run scripts/deploy.ts --network localhost
+
+
 ## Contracts on Fantom Opera
 
 - **BDeployer:** [0x2217AEC3440E8FD6d49A118B1502e539f88Dba55](https://ftmscan.com/address/0x2217aec3440e8fd6d49a118b1502e539f88dba55#code)
