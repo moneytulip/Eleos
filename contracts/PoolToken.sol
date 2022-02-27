@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT-License
+
 pragma solidity =0.8.9;
 
 import "./EleosERC20.sol";
@@ -8,16 +10,31 @@ import "./libraries/SafeMath.sol";
 contract PoolToken is EleosERC20 {
     using SafeMath for uint256;
 
+    event Mint(
+        address indexed sender,
+        address indexed minter,
+        uint256 mintAmount,
+        uint256 mintTokens
+    );
+    event Redeem(
+        address indexed sender,
+        address indexed redeemer,
+        uint256 redeemAmount,
+        uint256 redeemTokens
+    );
+    event Sync(uint256 totalBalance);
+
+
     uint256 internal constant initialExchangeRate = 1e18;
-    address public override underlying;
-    address public override factory;
-    uint256 public override totalBalance;
-    uint256 public constant override MINIMUM_LIQUIDITY = 1000;
+    address public underlying;
+    address public factory;
+    uint256 public totalBalance;
+    uint256 public constant MINIMUM_LIQUIDITY = 1000;
 
     /*** Initialize ***/
 
     // called once by the factory
-    function _setFactory() external override {
+    function _setFactory() external {
         require(factory == address(0), "Eleos: FACTORY_ALREADY_SET");
         factory = msg.sender;
     }
@@ -29,7 +46,7 @@ contract PoolToken is EleosERC20 {
         emit Sync(totalBalance);
     }
 
-    function exchangeRate() public virtual override returns (uint256) {
+    function exchangeRate() public virtual returns (uint256) {
         uint256 _totalSupply = totalSupply; // gas savings
         uint256 _totalBalance = totalBalance; // gas savings
         if (_totalSupply == 0 || _totalBalance == 0) return initialExchangeRate;
@@ -39,7 +56,6 @@ contract PoolToken is EleosERC20 {
     // this low-level function should be called from another contract
     function mint(address minter)
         external
-        override
         nonReentrant
         update
         returns (uint256 mintTokens)
@@ -61,7 +77,6 @@ contract PoolToken is EleosERC20 {
     // this low-level function should be called from another contract
     function redeem(address redeemer)
         external
-        override
         nonReentrant
         update
         returns (uint256 redeemAmount)
@@ -77,7 +92,7 @@ contract PoolToken is EleosERC20 {
     }
 
     // force real balance to match totalBalance
-    function skim(address to) external override nonReentrant {
+    function skim(address to) external nonReentrant {
         _safeTransfer(
             to,
             IERC20(underlying).balanceOf(address(this)).sub(totalBalance)
@@ -85,7 +100,7 @@ contract PoolToken is EleosERC20 {
     }
 
     // force totalBalance to match real balance
-    function sync() external virtual override nonReentrant update {}
+    function sync() external virtual nonReentrant update {}
 
     /*** Utilities ***/
 

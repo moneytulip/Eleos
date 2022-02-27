@@ -12,10 +12,11 @@ import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/UQ112x112.sol";
 import "./libraries/Math.sol";
 
-contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
+contract Collateral is PoolToken, CStorage, CSetter {
+    using SafeMath for uint256;
     using UQ112x112 for uint224;
 
-    constructor() public {}
+    constructor() {}
 
     /*** Collateralization Model ***/
 
@@ -96,7 +97,6 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     function tokensUnlocked(address from, uint256 value)
         public
         virtual
-        override
         returns (bool)
     {
         uint256 _balance = balanceOf[from];
@@ -119,10 +119,10 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address borrower,
         uint256 amount0,
         uint256 amount1
-    ) public override returns (uint256 liquidity, uint256 shortfall) {
-        if (amount0 == uint256(-1))
+    ) public returns (uint256 liquidity, uint256 shortfall) {
+        if (amount0 ==type(uint256).max)
             amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
-        if (amount1 == uint256(-1))
+        if (amount1 ==type(uint256).max)
             amount1 = IBorrowable(borrowable1).borrowBalance(borrower);
         uint256 amountCollateral = balanceOf[borrower].mul(exchangeRate()).div(
             1e18
@@ -133,17 +133,16 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
     function accountLiquidity(address borrower)
         public
         virtual
-        override
         returns (uint256 liquidity, uint256 shortfall)
     {
-        return accountLiquidityAmounts(borrower, uint256(-1), uint256(-1));
+        return accountLiquidityAmounts(borrower,type(uint256).max,type(uint256).max);
     }
 
     function canBorrow(
         address borrower,
         address borrowable,
         uint256 accountBorrows
-    ) public virtual override returns (bool) {
+    ) public virtual returns (bool) {
         address _borrowable0 = borrowable0;
         address _borrowable1 = borrowable1;
         require(
@@ -152,10 +151,10 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         );
         uint256 amount0 = borrowable == _borrowable0
             ? accountBorrows
-            : uint256(-1);
+            : type(uint256).max;
         uint256 amount1 = borrowable == _borrowable1
             ? accountBorrows
-            : uint256(-1);
+            : type(uint256).max;
         (, uint256 shortfall) = accountLiquidityAmounts(
             borrower,
             amount0,
@@ -169,7 +168,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address liquidator,
         address borrower,
         uint256 repayAmount
-    ) external override returns (uint256 seizeTokens) {
+    ) external returns (uint256 seizeTokens) {
         require(
             msg.sender == borrowable0 || msg.sender == borrowable1,
             "Eleos: UNAUTHORIZED"
@@ -201,7 +200,7 @@ contract Collateral is ICollateral, PoolToken, CStorage, CSetter {
         address redeemer,
         uint256 redeemAmount,
         bytes calldata data
-    ) external override nonReentrant update {
+    ) external nonReentrant update {
         require(redeemAmount <= totalBalance, "Eleos: INSUFFICIENT_CASH");
 
         // optimistically transfer funds

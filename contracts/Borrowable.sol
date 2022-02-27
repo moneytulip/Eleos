@@ -14,14 +14,14 @@ import "./interfaces/IBorrowTracker.sol";
 import "./libraries/Math.sol";
 
 contract Borrowable is
-    IBorrowable,
+    // IBorrowable,
     PoolToken,
     BStorage,
     BSetter,
     BInterestRateModel,
     BAllowance
 {
-    uint256 public constant BORROW_FEE = 0.001e18; //0.1%
+    using SafeMath for uint256;
 
     event Borrow(
         address indexed sender,
@@ -44,7 +44,9 @@ contract Borrowable is
         uint256 totalBorrows
     );
 
-    constructor() public {}
+    uint256 public constant BORROW_FEE = 0.001e18; //0.1%
+
+    constructor() {}
 
     /*** PoolToken ***/
 
@@ -95,7 +97,6 @@ contract Borrowable is
         public
         view
         virtual
-        override
         returns (uint256)
     {
         BorrowSnapshot memory borrowSnapshot = borrowBalances[borrower];
@@ -174,7 +175,7 @@ contract Borrowable is
         address receiver,
         uint256 borrowAmount,
         bytes calldata data
-    ) external override nonReentrant update accrue {
+    ) external nonReentrant update accrue {
         uint256 _totalBalance = totalBalance;
         require(borrowAmount <= _totalBalance, "Eleos: INSUFFICIENT_CASH");
         _checkBorrowAllowance(borrower, msg.sender, borrowAmount);

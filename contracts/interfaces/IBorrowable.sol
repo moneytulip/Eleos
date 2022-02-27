@@ -54,7 +54,7 @@ interface IBorrowable is IPoolToken {
 
     function borrowTracker() external view returns (address);
 
-    function BORROW_PERMIT_TYPEHASH() external pure returns (bytes32);
+    // function BORROW_PERMIT_TYPEHASH() external view returns (bytes32);
 
     function borrowApprove(address spender, uint256 value)
         external
@@ -93,9 +93,9 @@ interface IBorrowable is IPoolToken {
     event CalculateKink(uint256 kinkRate);
     event CalculateBorrowRate(uint256 borrowRate);
 
-    function KINK_BORROW_RATE_MAX() external pure returns (uint256);
+    function KINK_BORROW_RATE_MAX() external view returns (uint256);
 
-    function KINK_BORROW_RATE_MIN() external pure returns (uint256);
+    function KINK_BORROW_RATE_MIN() external view returns (uint256);
 
     function KINK_MULTIPLIER() external pure returns (uint256);
 
@@ -120,15 +120,15 @@ interface IBorrowable is IPoolToken {
     event NewAdjustSpeed(uint256 newAdjustSpeed);
     event NewBorrowTracker(address newBorrowTracker);
 
-    function RESERVE_FACTOR_MAX() external pure returns (uint256);
+    function RESERVE_FACTOR_MAX() external view returns (uint256);
 
-    function KINK_UR_MIN() external pure returns (uint256);
+    // function KINK_UR_MIN() external view returns (uint256);
 
-    function KINK_UR_MAX() external pure returns (uint256);
+    // function KINK_UR_MAX() external view returns (uint256);
 
-    function ADJUST_SPEED_MIN() external pure returns (uint256);
+    // function ADJUST_SPEED_MIN() external view returns (uint256);
 
-    function ADJUST_SPEED_MAX() external pure returns (uint256);
+    // function ADJUST_SPEED_MAX() external view returns (uint256);
 
     function _initialize(
         string calldata _name,

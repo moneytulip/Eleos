@@ -44,7 +44,7 @@ contract MockUniswapV2Pair is MockERC20 {
 	}
 	
 	function toUint112(uint256 input) internal pure returns(uint112) {
-		require(input <= uint112(-1), "MockUniPair: UINT224_OVERFLOW");
+		require(input <= type(uint112).max, "MockUniPair: UINT224_OVERFLOW");
 		return uint112(input);
 	}
 }

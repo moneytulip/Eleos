@@ -3,12 +3,11 @@
 pragma solidity =0.8.9;
 
 import "./libraries/SafeMath.sol";
-import "./interfaces/IPoolToken.sol";
 
 // This contract is basically UniswapV2ERC20 with small modifications
 // src: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol
 
-abstract contract EleosERC20 is IPoolToken {
+abstract contract EleosERC20 {
     using SafeMath for uint256;
 
     string public name;
@@ -20,6 +19,13 @@ abstract contract EleosERC20 is IPoolToken {
 
     bytes32 public DOMAIN_SEPARATOR;
     mapping(address => uint256) public nonces;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 
     constructor() {}
 
@@ -68,7 +74,7 @@ abstract contract EleosERC20 is IPoolToken {
         address from,
         address to,
         uint256 value
-    ) internal {
+    ) virtual internal {
         balanceOf[from] = balanceOf[from].sub(
             value,
             "Eleos: TRANSFER_TOO_HIGH"
