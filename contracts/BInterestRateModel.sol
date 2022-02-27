@@ -1,9 +1,12 @@
+// SPDX-License-Identifier: MIT-License
+
 pragma solidity =0.8.9;
 
 import "./BStorage.sol";
 import "./PoolToken.sol";
 
 contract BInterestRateModel is PoolToken, BStorage {
+	using SafeMath for uint256;
 
 	// When utilization is 100% borrowRate is kinkBorrowRate * KINK_MULTIPLIER
 	// kinkBorrowRate relative adjustment per second belongs to [1-adjustSpeed, 1+adjustSpeed*(KINK_MULTIPLIER-1)]

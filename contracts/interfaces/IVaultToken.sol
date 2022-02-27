@@ -70,8 +70,6 @@ interface IVaultToken {
     );
     event Sync(uint256 totalBalance);
 
-    function underlying() external view returns (address);
-
     function factory() external view returns (address);
 
     function totalBalance() external view returns (uint256);
@@ -85,6 +83,8 @@ interface IVaultToken {
     function redeem(address redeemer) external returns (uint256 redeemAmount);
 
     function skim(address to) external;
+
+    function underlying() external view returns (address);
 
     function sync() external;
 

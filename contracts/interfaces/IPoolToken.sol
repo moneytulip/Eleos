@@ -5,13 +5,6 @@ pragma solidity >=0.8.9;
 interface IPoolToken {
     /*** Eleos ERC20 ***/
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-
     function name() external view returns (string memory);
 
     function symbol() external view returns (string memory);
@@ -37,9 +30,9 @@ interface IPoolToken {
         uint256 value
     ) external returns (bool);
 
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
+    // function DOMAIN_SEPARATOR() external view returns (bytes32);
 
-    function PERMIT_TYPEHASH() external view returns (bytes32);
+    // function PERMIT_TYPEHASH() external view returns (bytes32);
 
     function nonces(address owner) external view returns (uint256);
 
