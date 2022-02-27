@@ -1,4 +1,6 @@
-pragma solidity =0.6.6;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity =0.8.9;
 
 import "./interfaces/IFactory.sol";
 import "./interfaces/IBDeployer.sol";
@@ -34,34 +36,13 @@ contract Factory is IFactory {
     ICDeployer public override cDeployer;
     IEleosPriceOracle public override eleosPriceOracle;
 
-    event LendingPoolInitialized(
-        address indexed uniswapV2Pair,
-        address indexed token0,
-        address indexed token1,
-        address collateral,
-        address borrowable0,
-        address borrowable1,
-        uint256 lendingPoolId
-    );
-    event NewPendingAdmin(address oldPendingAdmin, address newPendingAdmin);
-    event NewAdmin(address oldAdmin, address newAdmin);
-    event NewReservesPendingAdmin(
-        address oldReservesPendingAdmin,
-        address newReservesPendingAdmin
-    );
-    event NewReservesAdmin(address oldReservesAdmin, address newReservesAdmin);
-    event NewReservesManager(
-        address oldReservesManager,
-        address newReservesManager
-    );
-
     constructor(
         address _admin,
         address _reservesAdmin,
         IBDeployer _bDeployer,
         ICDeployer _cDeployer,
         IEleosPriceOracle _eleosPriceOracle
-    ) public {
+    ) {
         admin = _admin;
         reservesAdmin = _reservesAdmin;
         bDeployer = _bDeployer;

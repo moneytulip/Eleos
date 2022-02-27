@@ -9,7 +9,7 @@ import '@nomiclabs/hardhat-truffle5';
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.6.6',
+    version: '0.8.9',
     settings: {
       optimizer: {
         enabled: true,

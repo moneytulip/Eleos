@@ -1,4 +1,6 @@
-pragma solidity =0.6.6;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity =0.8.9;
 pragma experimental ABIEncoderV2;
 
 import "./interfaces/IRouter02.sol";
@@ -623,7 +625,7 @@ contract Router02 is IRouter02, IEleosCallee {
             permitData,
             (bool, uint8, bytes32, bytes32)
         );
-        uint256 value = approveMax ? uint256(-1) : amount;
+        uint256 value = approveMax ? type(uint256).max : amount;
         IPoolToken(poolToken).permit(
             msg.sender,
             address(this),
@@ -646,7 +648,7 @@ contract Router02 is IRouter02, IEleosCallee {
             permitData,
             (bool, uint8, bytes32, bytes32)
         );
-        uint256 value = approveMax ? uint256(-1) : amount;
+        uint256 value = approveMax ? type(uint256).max : amount;
         IBorrowable(borrowable).borrowPermit(
             msg.sender,
             address(this),
@@ -737,13 +739,15 @@ contract Router02 is IRouter02, IEleosCallee {
     {
         require(index < 2, "EleosRouter: INDEX_TOO_HIGH");
         borrowable = address(
-            uint256(
-                keccak256(
-                    abi.encodePacked(
-                        hex"ff",
-                        bDeployer,
-                        keccak256(abi.encodePacked(factory, underlying, index)),
-                        hex"067f8dd3c5fa034c69b1d9017422ce5a724f7633bb87e2b00437b825ee74da48" // Borrowable bytecode keccak256
+            uint160(
+                uint256(
+                    keccak256(
+                        abi.encodePacked(
+                            hex"ff",
+                            bDeployer,
+                            keccak256(abi.encodePacked(factory, underlying, index)),
+                            hex"067f8dd3c5fa034c69b1d9017422ce5a724f7633bb87e2b00437b825ee74da48" // Borrowable bytecode keccak256
+                        )
                     )
                 )
             )
@@ -758,13 +762,15 @@ contract Router02 is IRouter02, IEleosCallee {
         returns (address collateral)
     {
         collateral = address(
-            uint256(
-                keccak256(
-                    abi.encodePacked(
-                        hex"ff",
-                        cDeployer,
-                        keccak256(abi.encodePacked(factory, underlying)),
-                        hex"f70b21cd5817faae2f81bc35b42bac82c6657ca6c7a29899eff2aa4eb8e18783" // Collateral bytecode keccak256
+            uint160(
+                uint256(
+                    keccak256(
+                        abi.encodePacked(
+                            hex"ff",
+                            cDeployer,
+                            keccak256(abi.encodePacked(factory, underlying)),
+                            hex"f70b21cd5817faae2f81bc35b42bac82c6657ca6c7a29899eff2aa4eb8e18783" // Collateral bytecode keccak256
+                        )
                     )
                 )
             )

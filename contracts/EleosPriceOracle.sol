@@ -1,4 +1,4 @@
-pragma solidity =0.6.6;
+pragma solidity =0.8.9;
 
 import "./libraries/UQ112x112.sol";
 import "./interfaces/IUniswapV2Pair.sol";
@@ -19,15 +19,8 @@ contract EleosPriceOracle is IEleosPriceOracle {
     }
     mapping(address => Pair) public override getPair;
 
-    event PriceUpdate(
-        address indexed pair,
-        uint256 priceCumulative,
-        uint32 blockTimestamp,
-        bool latestIsSlotA
-    );
-
     function toUint224(uint256 input) internal pure returns (uint224) {
-        require(input <= uint224(-1), "EleosPriceOracle: UINT224_OVERFLOW");
+        require(input <= type(uint224).max, "EleosPriceOracle: UINT224_OVERFLOW");
         return uint224(input);
     }
 
