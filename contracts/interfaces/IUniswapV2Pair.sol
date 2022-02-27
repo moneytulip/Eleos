@@ -1,4 +1,6 @@
-pragma solidity >=0.6.6;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity >=0.8.9;
 
 interface IUniswapV2Pair {
     event Approval(
@@ -32,8 +34,6 @@ interface IUniswapV2Pair {
         address to,
         uint256 value
     ) external returns (bool);
-
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
 
     function PERMIT_TYPEHASH() external pure returns (bytes32);
 

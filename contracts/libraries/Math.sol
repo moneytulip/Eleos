@@ -1,4 +1,6 @@
-pragma solidity =0.6.6;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity =0.8.9;
 
 // a library for performing various math operations
 // forked from: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/libraries/Math.sol

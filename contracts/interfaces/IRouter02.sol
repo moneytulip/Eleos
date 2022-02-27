@@ -1,13 +1,15 @@
-pragma solidity >=0.5.0;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity >=0.8.9;
 
 interface IRouter02 {
-    function factory() external pure returns (address);
+    function factory() external view returns (address);
 
-    function bDeployer() external pure returns (address);
+    function bDeployer() external view returns (address);
 
-    function cDeployer() external pure returns (address);
+    function cDeployer() external view returns (address);
 
-    function WETH() external pure returns (address);
+    function WETH() external view returns (address);
 
     function mint(
         address poolToken,

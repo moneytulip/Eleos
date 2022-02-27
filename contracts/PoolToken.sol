@@ -1,30 +1,18 @@
-pragma solidity =0.6.6;
+pragma solidity =0.8.9;
 
 import "./EleosERC20.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IPoolToken.sol";
 import "./libraries/SafeMath.sol";
 
-contract PoolToken is IPoolToken, EleosERC20 {
+contract PoolToken is EleosERC20 {
+    using SafeMath for uint256;
+
     uint256 internal constant initialExchangeRate = 1e18;
     address public override underlying;
     address public override factory;
     uint256 public override totalBalance;
     uint256 public constant override MINIMUM_LIQUIDITY = 1000;
-
-    event Mint(
-        address indexed sender,
-        address indexed minter,
-        uint256 mintAmount,
-        uint256 mintTokens
-    );
-    event Redeem(
-        address indexed sender,
-        address indexed redeemer,
-        uint256 redeemAmount,
-        uint256 redeemTokens
-    );
-    event Sync(uint256 totalBalance);
 
     /*** Initialize ***/
 

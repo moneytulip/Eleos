@@ -1,11 +1,14 @@
-pragma solidity =0.6.6;
+// SPDX-License-Identifier: MIT-License
+
+pragma solidity =0.8.9;
 
 import "./libraries/SafeMath.sol";
+import "./interfaces/IPoolToken.sol";
 
 // This contract is basically UniswapV2ERC20 with small modifications
 // src: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol
 
-abstract contract EleosERC20 {
+abstract contract EleosERC20 is IPoolToken {
     using SafeMath for uint256;
 
     string public name;
@@ -18,14 +21,7 @@ abstract contract EleosERC20 {
     bytes32 public DOMAIN_SEPARATOR;
     mapping(address => uint256) public nonces;
 
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(
-        address indexed owner,
-        address indexed spender,
-        uint256 value
-    );
-
-    constructor() public {}
+    constructor() {}
 
     function _setName(string memory _name, string memory _symbol) internal {
         name = _name;
@@ -96,7 +92,7 @@ abstract contract EleosERC20 {
         address to,
         uint256 value
     ) external returns (bool) {
-        if (allowance[from][msg.sender] != uint256(-1)) {
+        if (allowance[from][msg.sender] != type(uint256).max) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value,
                 "Eleos: TRANSFER_NOT_ALLOWED"

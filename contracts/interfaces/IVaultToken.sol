@@ -1,4 +1,6 @@
-pragma solidity >=0.5.0;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity >=0.8.9;
 
 import "./IMasterChef.sol";
 import "./IUniswapV2Router01.sol";
@@ -37,8 +39,6 @@ interface IVaultToken {
         address to,
         uint256 value
     ) external returns (bool);
-
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
 
     function PERMIT_TYPEHASH() external pure returns (bytes32);
 
