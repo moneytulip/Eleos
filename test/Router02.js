@@ -936,10 +936,10 @@ contract("Router02", function (accounts) {
     await checkETHBalance(op2, liquidator, expectedETHAmount, true);
   });
 
-  it("tarotBorrow is forbidden to non-borrowable", async () => {
+  it("eleosBorrow is forbidden to non-borrowable", async () => {
     // Fails because data cannot be empty
     await expectRevert.unspecified(
-      router.tarotBorrow(router.address, address(0), "0", "0x")
+      router.eleosBorrow(router.address, address(0), "0", "0x")
     );
     const data = encode(
       ["uint8", "address", "uint8", "bytes"],
@@ -947,7 +947,7 @@ contract("Router02", function (accounts) {
     );
     // Fails becasue msg.sender is not a borrowable
     await expectRevert(
-      router.tarotBorrow(router.address, address(0), "0", data),
+      router.eleosBorrow(router.address, address(0), "0", data),
       "EleosRouter: UNAUTHORIZED_CALLER"
     );
     // Fails because sender is not the router
@@ -958,10 +958,10 @@ contract("Router02", function (accounts) {
     );
   });
 
-  it("tarotRedeem is forbidden to non-collateral", async () => {
+  it("eleosRedeem is forbidden to non-collateral", async () => {
     // Fails because data cannot be empty
     await expectRevert.unspecified(
-      router.tarotRedeem(router.address, "0", "0x")
+      router.eleosRedeem(router.address, "0", "0x")
     );
     const data = encode(
       ["uint8", "address", "uint8", "bytes"],
@@ -969,7 +969,7 @@ contract("Router02", function (accounts) {
     );
     // Fails becasue msg.sender is not a borrowable
     await expectRevert(
-      router.tarotRedeem(router.address, "0", data),
+      router.eleosRedeem(router.address, "0", data),
       "EleosRouter: UNAUTHORIZED_CALLER"
     );
     // Fails because sender is not the router
