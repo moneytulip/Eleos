@@ -79,7 +79,10 @@ contract BInterestRateModel is PoolToken, BStorage {
 		
 		uint32 blockTimestamp = getBlockTimestamp();
 		if (_accrualTimestamp == blockTimestamp) return;
-		uint32 timeElapsed = blockTimestamp - _accrualTimestamp; // underflow is desired
+		uint32 timeElapsed;
+		unchecked {
+			timeElapsed = blockTimestamp - _accrualTimestamp; // underflow is desired
+		}
 		accrualTimestamp = blockTimestamp;
 		
 		uint interestFactor = uint(borrowRate).mul(timeElapsed);	
