@@ -24,7 +24,6 @@ contract PoolToken is EleosERC20 {
     );
     event Sync(uint256 totalBalance);
 
-
     uint256 internal constant initialExchangeRate = 1e18;
     address public underlying;
     address public factory;
@@ -56,6 +55,7 @@ contract PoolToken is EleosERC20 {
     // this low-level function should be called from another contract
     function mint(address minter)
         external
+        virtual
         nonReentrant
         update
         returns (uint256 mintTokens)
@@ -77,6 +77,7 @@ contract PoolToken is EleosERC20 {
     // this low-level function should be called from another contract
     function redeem(address redeemer)
         external
+        virtual
         nonReentrant
         update
         returns (uint256 redeemAmount)
