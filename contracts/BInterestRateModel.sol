@@ -26,7 +26,10 @@ contract BInterestRateModel is PoolToken, BStorage {
 		uint32 _rateUpdateTimestamp = rateUpdateTimestamp;		
 	
 		// update kinkBorrowRate using previous borrowRate
-		uint32 timeElapsed = getBlockTimestamp() - _rateUpdateTimestamp; // underflow is desired
+		uint32 timeElapsed;
+		unchecked {
+			timeElapsed = getBlockTimestamp() - _rateUpdateTimestamp; // underflow is desired
+		}
 		if(timeElapsed > 0) {
 			rateUpdateTimestamp = getBlockTimestamp();
 			uint adjustFactor;
