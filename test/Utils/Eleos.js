@@ -137,7 +137,7 @@ function getDomainSeparator(name, tokenAddress) {
 				keccak256(toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')),
 				keccak256(toUtf8Bytes(name)),
 				keccak256(toUtf8Bytes('1')),
-				1,
+				31337, // 1,
 				tokenAddress
 			]
 		)
@@ -219,7 +219,6 @@ async function sendBorrowPermit(opts) {
 	const { v, r, s } = ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(private_key, 'hex'));
 	return token.borrowPermit(owner, spender, value, deadline, v, hexlify(r), hexlify(s));
 }
-
 
 module.exports = {
 	MockERC20,

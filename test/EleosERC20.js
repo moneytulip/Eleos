@@ -46,7 +46,7 @@ contract('EleosERC20', function (accounts) {
 		token = await EleosERC20.new(NAME, SYMBOL);
 		await token.mint(user, TOTAL_SUPPLY);
 	});
-	
+
 	it('name, symbol, decimals, totalSupply, balanceOf, DOMAIN_SEPARATOR, PERMIT_TYPEHASH', async () => {
 		expect(await token.name()).to.eq(NAME);
 		expect(await token.symbol()).to.eq(SYMBOL);
@@ -58,7 +58,7 @@ contract('EleosERC20', function (accounts) {
 			keccak256(toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'))
 		);
 	})
-	
+
 	it('approve', async () => {
 		const receipt = await token.approve(other, TEST_AMOUNT, {from: user});
 		expectEvent(receipt, 'Approval', {

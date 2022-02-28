@@ -119,25 +119,12 @@ abstract contract EleosERC20 {
         bytes32 typehash
     ) internal {
         require(deadline >= block.timestamp, "Eleos: EXPIRED");
-        bytes32 digest = keccak256(
-            abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(
-                    abi.encode(
-                        typehash,
-                        owner,
-                        spender,
-                        value,
-                        nonces[owner]++,
-                        deadline
-                    )
-                )
-            )
-        );
-        address recoveredAddress = ecrecover(digest, v, r, s);
+        bytes32 hashStruct = keccak256(abi.encode(typehash, owner, spender, value, nonces[owner]++, deadline));
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hashStruct));
+        address recoveredOwner = ecrecover(digest, v, r, s);
+
         require(
-            recoveredAddress != address(0) && recoveredAddress == owner,
+            recoveredOwner != address(0) && recoveredOwner == owner,
             "Eleos: INVALID_SIGNATURE"
         );
     }
@@ -145,7 +132,8 @@ abstract contract EleosERC20 {
     // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
     // TODO: fix this
     bytes32 public constant PERMIT_TYPEHASH =
-        0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+        // 0xfc77c2b9d30fe91687fd39abb7d16fcdfe1472d065740051ab8b13e4bf4a617f;
+        keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
 
     function permit(
         address owner,
