@@ -20,10 +20,10 @@ const DEADLINE = MAX_UINT_256;
 
 const MockERC20 = artifacts.require("MockERC20");
 const UniswapV2Factory = artifacts.require(
-  "test/Contracts/spooky/UniswapV2Factory.sol:UniswapV2Factory"
+  "test/Contracts/UniswapV2Factory.sol:UniswapV2Factory"
 );
 const UniswapV2Pair = artifacts.require(
-  "test/Contracts/uniswap-v2-core/UniswapV2Pair.sol:UniswapV2Pair"
+  "test/Contracts/UniswapV2Pair.sol:UniswapV2Pair"
 );
 const EleosPriceOracle = artifacts.require("EleosPriceOracle");
 const Factory = artifacts.require("Factory");
