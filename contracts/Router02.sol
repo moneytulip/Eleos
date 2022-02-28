@@ -746,7 +746,8 @@ contract Router02 is IRouter02, IEleosCallee {
                             hex"ff",
                             bDeployer,
                             keccak256(abi.encodePacked(factory, underlying, index)),
-                            hex"067f8dd3c5fa034c69b1d9017422ce5a724f7633bb87e2b00437b825ee74da48" // Borrowable bytecode keccak256
+                            hex"2f63550ac280d9a53b2d71ec8dfaf99607eb5236eb4bd236e19d8ff44e63b7fc" // Borrowable bytecode keccak256
+                            // hex"067f8dd3c5fa034c69b1d9017422ce5a724f7633bb87e2b00437b825ee74da48" // Borrowable bytecode keccak256
                         )
                     )
                 )
@@ -769,7 +770,8 @@ contract Router02 is IRouter02, IEleosCallee {
                             hex"ff",
                             cDeployer,
                             keccak256(abi.encodePacked(factory, underlying)),
-                            hex"f70b21cd5817faae2f81bc35b42bac82c6657ca6c7a29899eff2aa4eb8e18783" // Collateral bytecode keccak256
+                            hex"e4703ffaa93755350986fe2f0b0d2b5bd1e2360eef7042607a55e68d14e5288f"
+                            // hex"f70b21cd5817faae2f81bc35b42bac82c6657ca6c7a29899eff2aa4eb8e18783" // Collateral bytecode keccak256
                         )
                     )
                 )
