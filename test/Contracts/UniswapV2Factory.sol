@@ -107,7 +107,7 @@ contract UniswapV2ERC20 {
         address to,
         uint256 value
     ) external returns (bool) {
-        if (allowance[from][msg.sender] != uint256(-1)) {
+        if (allowance[from][msg.sender] != type(uint256).max) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value
             );
@@ -229,13 +229,6 @@ interface IUniswapV2Callee {
 }
 
 interface IUniswapV2Factory {
-    event PairCreated(
-        address indexed token0,
-        address indexed token1,
-        address pair,
-        uint256
-    );
-
     function feeTo() external view returns (address);
 
     function feeToSetter() external view returns (address);
@@ -350,7 +343,7 @@ contract UniswapV2Pair is UniswapV2ERC20 {
         uint112 _reserve1
     ) private {
         require(
-            balance0 <= uint112(-1) && balance1 <= uint112(-1),
+            balance0 <= type(uint112).max && balance1 <= type(uint112).max,
             "UniswapV2: OVERFLOW"
         );
         uint32 blockTimestamp = uint32(block.timestamp % 2**32);

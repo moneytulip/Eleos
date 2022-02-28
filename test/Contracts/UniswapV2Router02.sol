@@ -6,9 +6,9 @@
 pragma solidity =0.8.9;
 
 interface IUniswapV2Router01 {
-    function factory() external pure returns (address);
+    function factory() external view returns (address);
 
-    function WETH() external pure returns (address);
+    function WETH() external view returns (address);
 
     function addLiquidity(
         address tokenA,
@@ -374,7 +374,7 @@ library UniswapV2Library {
     ) internal pure returns (address pair) {
         (address token0, address token1) = sortTokens(tokenA, tokenB);
         pair = address(
-            uint256(
+            uint160(uint256(
                 keccak256(
                     abi.encodePacked(
                         hex"ff",
@@ -384,7 +384,7 @@ library UniswapV2Library {
                     )
                 )
             )
-        );
+        ));
     }
 
     // fetches and sorts the reserves for a pair
@@ -812,7 +812,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         bytes32 s
     ) external virtual override returns (uint256 amountA, uint256 amountB) {
         address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB);
-        uint256 value = approveMax ? uint256(-1) : liquidity;
+        uint256 value = approveMax ? type(uint256).max : liquidity;
         IUniswapV2Pair(pair).permit(
             msg.sender,
             address(this),
@@ -851,7 +851,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         returns (uint256 amountToken, uint256 amountETH)
     {
         address pair = UniswapV2Library.pairFor(factory, token, WETH);
-        uint256 value = approveMax ? uint256(-1) : liquidity;
+        uint256 value = approveMax ? type(uint256).max : liquidity;
         IUniswapV2Pair(pair).permit(
             msg.sender,
             address(this),
@@ -911,7 +911,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         bytes32 s
     ) external virtual override returns (uint256 amountETH) {
         address pair = UniswapV2Library.pairFor(factory, token, WETH);
-        uint256 value = approveMax ? uint256(-1) : liquidity;
+        uint256 value = approveMax ? type(uint256).max : liquidity;
         IUniswapV2Pair(pair).permit(
             msg.sender,
             address(this),
