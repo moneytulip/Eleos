@@ -3,13 +3,6 @@
 pragma solidity >=0.8.9;
 
 interface IEleosPriceOracle {
-    event PriceUpdate(
-        address indexed pair,
-        uint256 priceCumulative,
-        uint32 blockTimestamp,
-        bool latestIsSlotA
-    );
-
     function MIN_T() external pure returns (uint32);
 
     function getPair(address uniswapV2Pair)
