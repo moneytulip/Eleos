@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT-License
 pragma solidity >=0.5.0;
 
 interface IVaultTokenFactory {

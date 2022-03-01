@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT-License
 pragma solidity 0.8.9;
 
 interface ERC20Interface {
