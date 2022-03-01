@@ -54,7 +54,7 @@ contract CollateralHarness is Collateral {
 	bool public useMockExchangeRate;
 	uint public _exchangeRate;
 	
-	function exchangeRate() public override returns (uint) {
+	function exchangeRate() public override view returns (uint) {
 		if (useMockExchangeRate) return _exchangeRate;
 		return super.exchangeRate();
 	}

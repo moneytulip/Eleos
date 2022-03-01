@@ -9,7 +9,7 @@ contract EleosPriceOracle {
     using UQ112x112 for uint224;
 
     uint32 public constant MIN_T = 1200;
-    
+
     event PriceUpdate(
         address indexed pair,
         uint256 priceCumulative,
@@ -75,6 +75,38 @@ contract EleosPriceOracle {
             blockTimestamp,
             true
         );
+    }
+
+    function getResultStale(address uniswapV2Pair)
+        external
+        view
+        returns (uint224 price, uint32 T)
+    {
+        Pair memory pair = getPair[uniswapV2Pair];
+        require(pair.initialized, "EleosPriceOracle: NOT_INITIALIZED");
+        Pair storage pairStorage = getPair[uniswapV2Pair];
+
+        uint32 blockTimestamp = getBlockTimestamp();
+        uint32 lastUpdateTimestamp = pair.latestIsSlotA
+            ? pair.lastUpdateSlotA
+            : pair.lastUpdateSlotB;
+        uint256 priceCumulativeCurrent = getPriceCumulativeCurrent(
+            uniswapV2Pair
+        );
+        uint256 priceCumulativeLast;
+
+        // don't update; return price using previous priceCumulative
+        lastUpdateTimestamp = pair.latestIsSlotA
+            ? pair.lastUpdateSlotB
+            : pair.lastUpdateSlotA;
+        priceCumulativeLast = pair.latestIsSlotA
+            ? pair.priceCumulativeSlotB
+            : pair.priceCumulativeSlotA;
+
+        T = blockTimestamp - lastUpdateTimestamp; // overflow is desired
+        require(T >= MIN_T, "EleosPriceOracle: NOT_READY"); //reverts only if the pair has just been initialized
+        // / is safe, and - overflow is desired
+        price = toUint224((priceCumulativeCurrent - priceCumulativeLast) / T);
     }
 
     function getResult(address uniswapV2Pair)
