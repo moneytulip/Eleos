@@ -4,10 +4,17 @@ import "./libraries/UQ112x112.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./interfaces/IEleosPriceOracle.sol";
 
-contract EleosPriceOracle is IEleosPriceOracle {
+contract EleosPriceOracle {
     using UQ112x112 for uint224;
 
-    uint32 public constant override MIN_T = 1200;
+    uint32 public constant MIN_T = 1200;
+    
+    event PriceUpdate(
+        address indexed pair,
+        uint256 priceCumulative,
+        uint32 blockTimestamp,
+        bool latestIsSlotA
+    );
 
     struct Pair {
         uint256 priceCumulativeSlotA;
@@ -17,10 +24,13 @@ contract EleosPriceOracle is IEleosPriceOracle {
         bool latestIsSlotA;
         bool initialized;
     }
-    mapping(address => Pair) public override getPair;
+    mapping(address => Pair) public getPair;
 
     function toUint224(uint256 input) internal pure returns (uint224) {
-        require(input <= type(uint224).max, "EleosPriceOracle: UINT224_OVERFLOW");
+        require(
+            input <= type(uint224).max,
+            "EleosPriceOracle: UINT224_OVERFLOW"
+        );
         return uint224(input);
     }
 
@@ -30,23 +40,27 @@ contract EleosPriceOracle is IEleosPriceOracle {
         returns (uint256 priceCumulative)
     {
         priceCumulative = IUniswapV2Pair(uniswapV2Pair).price0CumulativeLast();
-        (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast) =
-            IUniswapV2Pair(uniswapV2Pair).getReserves();
+        (
+            uint112 reserve0,
+            uint112 reserve1,
+            uint32 blockTimestampLast
+        ) = IUniswapV2Pair(uniswapV2Pair).getReserves();
         uint224 priceLatest = UQ112x112.encode(reserve1).uqdiv(reserve0);
         uint32 timeElapsed = getBlockTimestamp() - blockTimestampLast; // overflow is desired
         // * never overflows, and + overflow is desired
         priceCumulative += uint256(priceLatest) * timeElapsed;
     }
 
-    function initialize(address uniswapV2Pair) external override {
+    function initialize(address uniswapV2Pair) external {
         Pair storage pairStorage = getPair[uniswapV2Pair];
         require(
             !pairStorage.initialized,
             "EleosPriceOracle: ALREADY_INITIALIZED"
         );
 
-        uint256 priceCumulativeCurrent =
-            getPriceCumulativeCurrent(uniswapV2Pair);
+        uint256 priceCumulativeCurrent = getPriceCumulativeCurrent(
+            uniswapV2Pair
+        );
         uint32 blockTimestamp = getBlockTimestamp();
         pairStorage.priceCumulativeSlotA = priceCumulativeCurrent;
         pairStorage.priceCumulativeSlotB = priceCumulativeCurrent;
@@ -64,7 +78,6 @@ contract EleosPriceOracle is IEleosPriceOracle {
 
     function getResult(address uniswapV2Pair)
         external
-        override
         returns (uint224 price, uint32 T)
     {
         Pair memory pair = getPair[uniswapV2Pair];
@@ -72,10 +85,12 @@ contract EleosPriceOracle is IEleosPriceOracle {
         Pair storage pairStorage = getPair[uniswapV2Pair];
 
         uint32 blockTimestamp = getBlockTimestamp();
-        uint32 lastUpdateTimestamp =
-            pair.latestIsSlotA ? pair.lastUpdateSlotA : pair.lastUpdateSlotB;
-        uint256 priceCumulativeCurrent =
-            getPriceCumulativeCurrent(uniswapV2Pair);
+        uint32 lastUpdateTimestamp = pair.latestIsSlotA
+            ? pair.lastUpdateSlotA
+            : pair.lastUpdateSlotB;
+        uint256 priceCumulativeCurrent = getPriceCumulativeCurrent(
+            uniswapV2Pair
+        );
         uint256 priceCumulativeLast;
 
         if (blockTimestamp - lastUpdateTimestamp >= MIN_T) {
