@@ -29,36 +29,28 @@ contract Collateral is PoolToken, CStorage, CSetter {
     {
         (uint224 twapPrice112x112, ) = IEleosPriceOracle(eleosPriceOracle)
             .getResult(underlying);
-        (uint112 reserve0, uint112 reserve1, ) = IUniswapV2Pair(underlying)
-            .getReserves();
-        uint256 collateralTotalSupply = IUniswapV2Pair(underlying)
-            .totalSupply();
+        return _computePrice(twapPrice112x112);
+    }
 
-        uint224 currentPrice112x112 = UQ112x112.encode(reserve1).uqdiv(
-            reserve0
-        );
-        uint256 adjustmentSquared = uint256(twapPrice112x112).mul(2**32).div(
-            currentPrice112x112
-        );
-        uint256 adjustment = Math.sqrt(adjustmentSquared.mul(2**32));
+    function _calculateLiquidityAndShortfall(
+        uint256 amountCollateral,
+        uint256 amount0,
+        uint256 amount1,
+        uint256 price0,
+        uint256 price1
+    ) private view returns (uint256 liquidity, uint256 shortfall) {
+        uint256 a = amount0.mul(price0).div(1e18);
+        uint256 b = amount1.mul(price1).div(1e18);
+        if (a < b) (a, b) = (b, a);
+        a = a.mul(safetyMarginSqrt).div(1e18);
+        b = b.mul(1e18).div(safetyMarginSqrt);
+        uint256 collateralNeeded = a.add(b).mul(liquidationIncentive).div(1e18);
 
-        uint256 currentBorrowable0Price = uint256(collateralTotalSupply)
-            .mul(1e18)
-            .div(reserve0 * 2);
-        uint256 currentBorrowable1Price = uint256(collateralTotalSupply)
-            .mul(1e18)
-            .div(reserve1 * 2);
-
-        price0 = currentBorrowable0Price.mul(adjustment).div(2**32);
-        price1 = currentBorrowable1Price.mul(2**32).div(adjustment);
-
-        /*
-         * Price calculation errors may happen in some edge pairs where
-         * reserve0 / reserve1 is close to 2**112 or 1/2**112
-         * We're going to prevent users from using pairs at risk from the UI
-         */
-        require(price0 > 100, "Eleos: PRICE_CALCULATION_ERROR");
-        require(price1 > 100, "Eleos: PRICE_CALCULATION_ERROR");
+        if (amountCollateral >= collateralNeeded) {
+            return (amountCollateral - collateralNeeded, 0);
+        } else {
+            return (0, collateralNeeded - amountCollateral);
+        }
     }
 
     // returns liquidity in  collateral's underlying
@@ -67,21 +59,15 @@ contract Collateral is PoolToken, CStorage, CSetter {
         uint256 amount0,
         uint256 amount1
     ) internal returns (uint256 liquidity, uint256 shortfall) {
-        uint256 _safetyMarginSqrt = safetyMarginSqrt;
         (uint256 price0, uint256 price1) = getPrices();
-
-        uint256 a = amount0.mul(price0).div(1e18);
-        uint256 b = amount1.mul(price1).div(1e18);
-        if (a < b) (a, b) = (b, a);
-        a = a.mul(_safetyMarginSqrt).div(1e18);
-        b = b.mul(1e18).div(_safetyMarginSqrt);
-        uint256 collateralNeeded = a.add(b).mul(liquidationIncentive).div(1e18);
-
-        if (amountCollateral >= collateralNeeded) {
-            return (amountCollateral - collateralNeeded, 0);
-        } else {
-            return (0, collateralNeeded - amountCollateral);
-        }
+        return
+            _calculateLiquidityAndShortfall(
+                amountCollateral,
+                amount0,
+                amount1,
+                price0,
+                price1
+            );
     }
 
     /*** ERC20 ***/
@@ -121,9 +107,9 @@ contract Collateral is PoolToken, CStorage, CSetter {
         uint256 amount0,
         uint256 amount1
     ) public returns (uint256 liquidity, uint256 shortfall) {
-        if (amount0 ==type(uint256).max)
+        if (amount0 == type(uint256).max)
             amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
-        if (amount1 ==type(uint256).max)
+        if (amount1 == type(uint256).max)
             amount1 = IBorrowable(borrowable1).borrowBalance(borrower);
         uint256 amountCollateral = balanceOf[borrower].mul(exchangeRate()).div(
             1e18
@@ -136,7 +122,78 @@ contract Collateral is PoolToken, CStorage, CSetter {
         virtual
         returns (uint256 liquidity, uint256 shortfall)
     {
-        return accountLiquidityAmounts(borrower,type(uint256).max,type(uint256).max);
+        return
+            accountLiquidityAmounts(
+                borrower,
+                type(uint256).max,
+                type(uint256).max
+            );
+    }
+
+    function exchangeRate() public view virtual override returns (uint256) {
+        if (totalSupply == 0 || totalBalance == 0) return initialExchangeRate;
+        return totalBalance.mul(1e18).div(totalSupply);
+    }
+
+    function _computePrice(uint224 twapPrice112x112)
+        private
+        view
+        returns (uint256 price0, uint256 price1)
+    {
+        (uint112 reserve0, uint112 reserve1, ) = IUniswapV2Pair(underlying)
+            .getReserves();
+        uint256 collateralTotalSupply = IUniswapV2Pair(underlying)
+            .totalSupply();
+        uint224 currentPrice112x112 = UQ112x112.encode(reserve1).uqdiv(
+            reserve0
+        );
+        uint256 adjustmentSquared = uint256(twapPrice112x112).mul(2**32).div(
+            currentPrice112x112
+        );
+        uint256 adjustment = Math.sqrt(adjustmentSquared.mul(2**32));
+
+        uint256 currentBorrowable0Price = uint256(collateralTotalSupply)
+            .mul(1e18)
+            .div(reserve0 * 2);
+        uint256 currentBorrowable1Price = uint256(collateralTotalSupply)
+            .mul(1e18)
+            .div(reserve1 * 2);
+
+        price0 = currentBorrowable0Price.mul(adjustment).div(2**32);
+        price1 = currentBorrowable1Price.mul(2**32).div(adjustment);
+
+        /*
+         * Price calculation errors may happen in some edge pairs where
+         * reserve0 / reserve1 is close to 2**112 or 1/2**112
+         * We're going to prevent users from using pairs at risk from the UI
+         */
+        require(price0 > 100, "Eleos: PRICE_CALCULATION_ERROR");
+        require(price1 > 100, "Eleos: PRICE_CALCULATION_ERROR");
+    }
+
+    function accountLiquidityStale(address borrower)
+        public
+        view
+        virtual
+        returns (uint256 liquidity, uint256 shortfall)
+    {
+        uint256 amount0 = IBorrowable(borrowable0).borrowBalance(borrower);
+        uint256 amount1 = IBorrowable(borrowable1).borrowBalance(borrower);
+        uint256 amountCollateral = balanceOf[borrower].mul(exchangeRate()).div(
+            1e18
+        );
+        (uint224 twapPrice112x112, ) = IEleosPriceOracle(eleosPriceOracle)
+            .getResultStale(underlying);
+        (uint256 price0, uint256 price1) = _computePrice(twapPrice112x112);
+
+        return
+            _calculateLiquidityAndShortfall(
+                amountCollateral,
+                amount0,
+                amount1,
+                price0,
+                price1
+            );
     }
 
     function canBorrow(

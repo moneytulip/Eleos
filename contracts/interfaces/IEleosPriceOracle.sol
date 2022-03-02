@@ -22,4 +22,9 @@ interface IEleosPriceOracle {
     function getResult(address uniswapV2Pair)
         external
         returns (uint224 price, uint32 T);
+
+    function getResultStale(address uniswapV2Pair)
+        external
+        view
+        returns (uint224 price, uint32 T);
 }

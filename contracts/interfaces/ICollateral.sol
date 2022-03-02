@@ -22,6 +22,11 @@ interface ICollateral is IPoolToken {
     function accountLiquidity(address account)
         external
         returns (uint256 liquidity, uint256 shortfall);
+    
+    function accountLiquidityStale(address account)
+        external
+        view
+        returns (uint256 liquidity, uint256 shortfall);
 
     function canBorrow(
         address account,
