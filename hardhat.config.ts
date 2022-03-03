@@ -19,7 +19,9 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: 'hardhat',
   networks: {
-    hardhat: {},
+    hardhat: {
+      gasPrice: 1000
+    },
     // fantom: {
     //   chainId: 250,
     //   url: 'https://rpcapi.fantom.network',
