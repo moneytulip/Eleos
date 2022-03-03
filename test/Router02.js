@@ -63,6 +63,7 @@ let LP_AMOUNT;
 let ETH_IS_A;
 const INITIAL_EXCHANGE_RATE = oneMantissa;
 const MINIMUM_LIQUIDITY = new BN(1000);
+const GAS_PRICE = 1000;
 
 async function checkETHBalance(
   operation,
@@ -78,13 +79,17 @@ async function checkETHBalance(
     const balanceDiff = bnMantissa(
       (balancePrior * 1 - balanceAfter * 1) / 1e18
     );
-    const expected = bnMantissa((expectedChange * 1 + gasUsed * 1) / 1e18);
+    const expected = bnMantissa(
+      (expectedChange * 1 + gasUsed * GAS_PRICE) / 1e18
+    );
     expectAlmostEqualMantissa(balanceDiff, expected);
   } else {
     const balanceDiff = bnMantissa(
       (balanceAfter * 1 - balancePrior * 1) / 1e18
     );
-    const expected = bnMantissa((expectedChange * 1 - gasUsed * 1) / 1e18);
+    const expected = bnMantissa(
+      (expectedChange * 1 - gasUsed * GAS_PRICE) / 1e18
+    );
     expectAlmostEqualMantissa(balanceDiff, expected);
   }
 }
