@@ -76,8 +76,8 @@ contract("Deleverage02 Vault", function (accounts) {
   let uniswapV2Router02;
   let masterChef;
   let vaultTokenFactory;
-  let tarotPriceOracle;
-  let tarotFactory;
+  let eleosPriceOracle;
+  let eleosFactory;
   let WETH;
   let UNI;
   let uniswapV2Pair;
@@ -91,15 +91,15 @@ contract("Deleverage02 Vault", function (accounts) {
     // Create base contracts
     rewardsToken = await MockERC20.new("", "");
     uniswapV2Factory = await UniswapV2Factory.new(address(0));
-    tarotPriceOracle = await EleosPriceOracle.new();
+    eleosPriceOracle = await EleosPriceOracle.new();
     const bDeployer = await BDeployer.new();
     const cDeployer = await CDeployer.new();
-    tarotFactory = await Factory.new(
+    eleosFactory = await Factory.new(
       address(0),
       address(0),
       bDeployer.address,
       cDeployer.address,
-      tarotPriceOracle.address
+      eleosPriceOracle.address
     );
     WETH = await WETH9.new();
     uniswapV2Router02 = await UniswapV2Router02.new(
@@ -107,7 +107,7 @@ contract("Deleverage02 Vault", function (accounts) {
       WETH.address
     );
     router = await Router02.new(
-      tarotFactory.address,
+      eleosFactory.address,
       bDeployer.address,
       cDeployer.address,
       WETH.address
@@ -145,19 +145,19 @@ contract("Deleverage02 Vault", function (accounts) {
     await vaultTokenFactory.createVaultToken(0);
     vaultToken = await VaultToken.at(vaultTokenAddress);
     // Create Pair On Eleos
-    collateralAddress = await tarotFactory.createCollateral.call(
+    collateralAddress = await eleosFactory.createCollateral.call(
       vaultTokenAddress
     );
-    borrowable0Address = await tarotFactory.createBorrowable0.call(
+    borrowable0Address = await eleosFactory.createBorrowable0.call(
       vaultTokenAddress
     );
-    borrowable1Address = await tarotFactory.createBorrowable1.call(
+    borrowable1Address = await eleosFactory.createBorrowable1.call(
       vaultTokenAddress
     );
-    await tarotFactory.createCollateral(vaultTokenAddress);
-    await tarotFactory.createBorrowable0(vaultTokenAddress);
-    await tarotFactory.createBorrowable1(vaultTokenAddress);
-    await tarotFactory.initializeLendingPool(vaultTokenAddress);
+    await eleosFactory.createCollateral(vaultTokenAddress);
+    await eleosFactory.createBorrowable0(vaultTokenAddress);
+    await eleosFactory.createBorrowable1(vaultTokenAddress);
+    await eleosFactory.initializeLendingPool(vaultTokenAddress);
     collateral = await Collateral.at(collateralAddress);
     const borrowable0 = await Borrowable.at(borrowable0Address);
     const borrowable1 = await Borrowable.at(borrowable1Address);

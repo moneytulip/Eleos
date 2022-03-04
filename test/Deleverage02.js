@@ -66,8 +66,8 @@ contract("Deleverage02", function (accounts) {
   let liquidator = accounts[3];
 
   let uniswapV2Factory;
-  let tarotPriceOracle;
-  let tarotFactory;
+  let eleosPriceOracle;
+  let eleosFactory;
   let WETH;
   let UNI;
   let uniswapV2Pair;
@@ -78,15 +78,15 @@ contract("Deleverage02", function (accounts) {
 
   beforeEach(async () => {
     uniswapV2Factory = await UniswapV2Factory.new(address(0));
-    tarotPriceOracle = await EleosPriceOracle.new();
+    eleosPriceOracle = await EleosPriceOracle.new();
     const bDeployer = await BDeployer.new();
     const cDeployer = await CDeployer.new();
-    tarotFactory = await Factory.new(
+    eleosFactory = await Factory.new(
       address(0),
       address(0),
       bDeployer.address,
       cDeployer.address,
-      tarotPriceOracle.address
+      eleosPriceOracle.address
     );
     WETH = await WETH9.new();
     UNI = await MockERC20.new("Uniswap", "UNI");
@@ -105,20 +105,20 @@ contract("Deleverage02", function (accounts) {
     });
     await uniswapV2Pair.mint(borrower);
     LP_AMOUNT = await uniswapV2Pair.balanceOf(borrower);
-    await tarotPriceOracle.initialize(uniswapV2PairAddress);
-    collateralAddress = await tarotFactory.createCollateral.call(
+    await eleosPriceOracle.initialize(uniswapV2PairAddress);
+    collateralAddress = await eleosFactory.createCollateral.call(
       uniswapV2PairAddress
     );
-    borrowable0Address = await tarotFactory.createBorrowable0.call(
+    borrowable0Address = await eleosFactory.createBorrowable0.call(
       uniswapV2PairAddress
     );
-    borrowable1Address = await tarotFactory.createBorrowable1.call(
+    borrowable1Address = await eleosFactory.createBorrowable1.call(
       uniswapV2PairAddress
     );
-    await tarotFactory.createCollateral(uniswapV2PairAddress);
-    await tarotFactory.createBorrowable0(uniswapV2PairAddress);
-    await tarotFactory.createBorrowable1(uniswapV2PairAddress);
-    await tarotFactory.initializeLendingPool(uniswapV2PairAddress);
+    await eleosFactory.createCollateral(uniswapV2PairAddress);
+    await eleosFactory.createBorrowable0(uniswapV2PairAddress);
+    await eleosFactory.createBorrowable1(uniswapV2PairAddress);
+    await eleosFactory.initializeLendingPool(uniswapV2PairAddress);
     collateral = await Collateral.at(collateralAddress);
     const borrowable0 = await Borrowable.at(borrowable0Address);
     const borrowable1 = await Borrowable.at(borrowable1Address);
@@ -126,7 +126,7 @@ contract("Deleverage02", function (accounts) {
     if (ETH_IS_A) [borrowableWETH, borrowableUNI] = [borrowable0, borrowable1];
     else [borrowableWETH, borrowableUNI] = [borrowable1, borrowable0];
     router = await Router02.new(
-      tarotFactory.address,
+      eleosFactory.address,
       bDeployer.address,
       cDeployer.address,
       WETH.address

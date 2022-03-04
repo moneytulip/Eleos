@@ -335,6 +335,7 @@ contract Router02 is IRouter02, IEleosCallee {
                 )
             })
         );
+
         // borrow borrowableA
         IBorrowable(borrowableA).borrow(
             msg.sender,
@@ -746,7 +747,7 @@ contract Router02 is IRouter02, IEleosCallee {
                             hex"ff",
                             bDeployer,
                             keccak256(abi.encodePacked(factory, underlying, index)),
-                            hex"067f8dd3c5fa034c69b1d9017422ce5a724f7633bb87e2b00437b825ee74da48" // Borrowable bytecode keccak256
+                            hex"1cfd3647076ae4cbba108df6563a88d82cbbedc15e0f4adbfae5c9dd095ad3e1" // Borrowable bytecode keccak256
                         )
                     )
                 )
@@ -769,7 +770,7 @@ contract Router02 is IRouter02, IEleosCallee {
                             hex"ff",
                             cDeployer,
                             keccak256(abi.encodePacked(factory, underlying)),
-                            hex"f70b21cd5817faae2f81bc35b42bac82c6657ca6c7a29899eff2aa4eb8e18783" // Collateral bytecode keccak256
+                            hex"00ddbb9d4ffaabb731114d43f5e811c59bec0d662edc5b3fd873e93ca7289426" // Collateral bytecode keccak256
                         )
                     )
                 )
