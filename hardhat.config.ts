@@ -24,7 +24,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
-      gasPrice: 1000
+      gasPrice: 1000000000
     },
     oasistest: {
       chainId: 42261,

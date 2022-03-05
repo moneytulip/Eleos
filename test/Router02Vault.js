@@ -71,7 +71,7 @@ let LP_AMOUNT;
 let ETH_IS_A;
 const INITIAL_EXCHANGE_RATE = oneMantissa;
 const MINIMUM_LIQUIDITY = new BN(1000);
-const GAS_PRICE = 1000;
+const GAS_PRICE = 1000000000;
 
 async function checkETHBalance(
   operation,
