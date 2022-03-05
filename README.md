@@ -13,8 +13,8 @@ npx hardhat run scripts/deployOracle.ts --network localhost
 npx hardhat run scripts/deploy.ts --network localhost
 
 
-## Contracts on Fantom Opera
+## Contracts on Oasis
 
-- **BDeployer:** [0x2217AEC3440E8FD6d49A118B1502e539f88Dba55](https://ftmscan.com/address/0x2217aec3440e8fd6d49a118b1502e539f88dba55#code)
-- **CDeployer:** [0x46fcDe1b89D61f5cBfAaB05C2914C367F8301F30](https://ftmscan.com/address/0x46fcde1b89d61f5cbfaab05c2914c367f8301f30#code)
-- **Factory:** [0x35C052bBf8338b06351782A565aa9AaD173432eA](https://ftmscan.com/address/0x35c052bbf8338b06351782a565aa9aad173432ea#code)
+- **BDeployer:** [0xD1eb5077de2a4eF1f75941B5eA6ebfb5Cb0B0198](https://explorer.emerald.oasis.dev/address/0x2217aec3440e8fd6d49a118b1502e539f88dba55#code)
+- **CDeployer:** [0xadB2a6273900C1facA83DA8624CcBA0887300201](https://explorer.emerald.oasis.dev/address/0x46fcde1b89d61f5cbfaab05c2914c367f8301f30#code)
+- **Factory:** [0x20fD0B2fbf1e499C4d41b1FdA8eF337992CF356B](https://explorer.emerald.oasis.dev/address/0x35c052bbf8338b06351782a565aa9aad173432ea#code)

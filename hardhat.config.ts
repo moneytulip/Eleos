@@ -29,12 +29,12 @@ const config: HardhatUserConfig = {
     oasistest: {
       chainId: 42261,
       url: "https://testnet.emerald.oasis.dev",
-      accounts: [process.env.OASIS_PRIV_KEY],
+      accounts: [process.env.OASIS_PRIV_KEY ?? ''],
     },
     oasis: {
       chainId: 42262,
       url: "https://emerald.oasis.dev",
-      accounts: [process.env.OASIS_PRIV_KEY],
+      accounts: [process.env.OASIS_PRIV_KEY ?? ''],
     },
   },
 };
