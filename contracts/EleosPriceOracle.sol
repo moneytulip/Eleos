@@ -27,6 +27,8 @@ contract EleosPriceOracle {
     }
     mapping(address => Pair) public getPair;
 
+    constructor() {}
+
     function toUint224(uint256 input) internal pure returns (uint224) {
         require(
             input <= type(uint224).max,
