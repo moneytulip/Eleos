@@ -23,7 +23,9 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {},
+    hardhat: {
+      gasPrice: 1000
+    },
     oasistest: {
       chainId: 42261,
       url: "https://testnet.emerald.oasis.dev",
