@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 
 async function main() {
   const router = await (
-    await ethers.getContractFactory("Router")
+    await ethers.getContractFactory("Router02")
   ).deploy(
     process.env.FACTORY_ADDRESS,
     process.env.BDEPLOYER_ADDRESS,
@@ -11,7 +11,7 @@ async function main() {
     process.env.WETH_ADDRESS,
   );
 
-  logContractDeploy("cDeployer", router);
+  logContractDeploy("router", router);
 
   await router.deployed();
 

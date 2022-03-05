@@ -14,7 +14,8 @@ npx hardhat run scripts/deploy.ts --network localhost
 
 
 ## Contracts on Oasis
-
-- **BDeployer:** [0xD1eb5077de2a4eF1f75941B5eA6ebfb5Cb0B0198](https://explorer.emerald.oasis.dev/address/0x2217aec3440e8fd6d49a118b1502e539f88dba55#code)
-- **CDeployer:** [0xadB2a6273900C1facA83DA8624CcBA0887300201](https://explorer.emerald.oasis.dev/address/0x46fcde1b89d61f5cbfaab05c2914c367f8301f30#code)
-- **Factory:** [0x20fD0B2fbf1e499C4d41b1FdA8eF337992CF356B](https://explorer.emerald.oasis.dev/address/0x35c052bbf8338b06351782a565aa9aad173432ea#code)
+- **EleosOracle** [0x5e8A25147e840C4F410EE33feEc4Ef96Db1A9063](https://explorer.emerald.oasis.dev/address/0x5e8A25147e840C4F410EE33feEc4Ef96Db1A9063#code)
+- **BDeployer:** [0x012dF99b7aB3E13F1458B807a0aB4E1f7bb32fDC](https://explorer.emerald.oasis.dev/address/0x012dF99b7aB3E13F1458B807a0aB4E1f7bb32fDC#code)
+- **CDeployer:** [0xC32aCe6aEE11342716A4Eb9efa98DC19E3184147](https://explorer.emerald.oasis.dev/address/0xC32aCe6aEE11342716A4Eb9efa98DC19E3184147#code)
+- **Factory:** [0xeD9a19D1B62b00F945E64bE2d7d24D0c962fc9Ef](https://explorer.emerald.oasis.dev/address/0xeD9a19D1B62b00F945E64bE2d7d24D0c962fc9Ef#code)
+- **Router:** [0xA987764B3133a2D6C9c6Cf4e9dFe45DeB1a056c7](https://explorer.emerald.oasis.dev/address/0xA987764B3133a2D6C9c6Cf4e9dFe45DeB1a056c7#code)
