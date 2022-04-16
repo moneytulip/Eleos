@@ -36,6 +36,11 @@ const config: HardhatUserConfig = {
       url: "https://emerald.oasis.dev",
       accounts: [process.env.OASIS_PRIV_KEY ?? ''],
     },
+    rinkeby: {
+      chainId: 4,
+      url: "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      accounts: [process.env.OASIS_PRIV_KEY ?? ''],
+    }
   },
 };
 
