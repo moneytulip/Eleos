@@ -27,6 +27,9 @@ npx hardhat run scripts/deploy.ts --network localhost
 - **Factory:** [0x142E5E493c803852D51526c5556a0Ee2FAFAC0D9](https://rinkeby.etherscan.io/address/0x142E5E493c803852D51526c5556a0Ee2FAFAC0D9#code)
 - **Router:** [0x5e8A25147e840C4F410EE33feEc4Ef96Db1A9063](https://rinkeby.etherscan.io/address/0x5e8A25147e840C4F410EE33feEc4Ef96Db1A9063#code)
 
+### Rinkeby Subgraph URLS: 
+- Queries (HTTP):     https://api.thegraph.com/subgraphs/name/lilypad-forest/eleosrinkeby
+- Subscriptions (WS): wss://api.thegraph.com/subgraphs/name/lilypad-forest/eleosrinkeby
 
 ## Deployment Procedure
 Deploy oracle
