@@ -1,7 +1,7 @@
 pragma solidity =0.8.9;
 
 import "./libraries/SafeMath.sol";
-import "./interfaces/IImx.sol";
+import "./interfaces/IAmpl.sol";
 import "./interfaces/IClaimable.sol";
 
 abstract contract Distributor is IClaimable {
@@ -55,7 +55,7 @@ abstract contract Distributor is IClaimable {
 		amount = updateCredit(account);
 		if (amount > 0) {
 			recipients[account].credit = 0;
-			IImx(imx).transfer(account, amount);
+			IAmpl(imx).transfer(account, amount);
 			emit Claim(account, amount);
 		}
 	}

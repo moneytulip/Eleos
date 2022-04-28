@@ -1,6 +1,6 @@
 pragma solidity =0.8.9;
 
-import "../interfaces/IImx.sol";
+import "../interfaces/IAmpl.sol";
 import "../interfaces/IClaimable.sol";
 
 contract MockClaimable is IClaimable {
@@ -21,7 +21,7 @@ contract MockClaimable is IClaimable {
 	}
 
 	function claim() public override returns (uint amount) {
-		amount = IImx(imx).balanceOf(address(this));
-		IImx(imx).transfer(recipient, amount);
+		amount = IAmpl(imx).balanceOf(address(this));
+		IAmpl(imx).transfer(recipient, amount);
 	}
 }

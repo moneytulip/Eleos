@@ -1,6 +1,6 @@
 pragma solidity =0.8.9;
 
-import "../interfaces/IImx.sol";
+import "../interfaces/IAmpl.sol";
 import "../interfaces/IClaimable.sol";
 import "../interfaces/IVester.sol";
 
@@ -38,8 +38,8 @@ contract VesterOneStep is IClaimable {
 		require(msg.sender == recipient, "Vester: UNAUTHORIZED");
 		uint blockTimestamp = getBlockTimestamp();
 		if (blockTimestamp < vestingBegin) return 0;
-		amount = IImx(imx).balanceOf(address(this));
-		IImx(imx).transfer(recipient, amount);
+		amount = IAmpl(imx).balanceOf(address(this));
+		IAmpl(imx).transfer(recipient, amount);
 	}
 	
 	uint _blockTimestamp;

@@ -1,7 +1,7 @@
 pragma solidity =0.8.9;
 
 import "./libraries/SafeMath.sol";
-import "./interfaces/IImx.sol";
+import "./interfaces/IAmpl.sol";
 import "./interfaces/IClaimable.sol";
 import "./interfaces/IVester.sol";
 
@@ -60,11 +60,11 @@ contract Vester is IClaimable {
 		uint blockTimestamp = getBlockTimestamp();
 		if (blockTimestamp < vestingBegin) return 0;
 		if (blockTimestamp > vestingEnd) {
-			amount = IImx(imx).balanceOf(address(this));
+			amount = IAmpl(imx).balanceOf(address(this));
 		} else {
 			amount = getUnlockedAmount();
 		}
-		if (amount > 0) IImx(imx).transfer(recipient, amount);
+		if (amount > 0) IAmpl(imx).transfer(recipient, amount);
 	}
 	
 	function setRecipient(address recipient_) public virtual {

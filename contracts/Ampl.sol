@@ -11,10 +11,10 @@ pragma experimental ABIEncoderV2;
 
 contract Imx {
     /// @notice EIP-20 token name for this token
-    string public constant name = "Impermax";
+    string public constant name = " Ampl";
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = "IMX";
+    string public constant symbol = " Ampl";
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;

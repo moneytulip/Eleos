@@ -270,7 +270,7 @@ contract('Highlevel', function (accounts) {
 		const borrowThirdRec = await ETHUNIb0.borrow(borrowerC, borrowerC, oneMantissa.mul(new BN(1)), '0x', {from:borrowerC});
 		await ETHUNIb1.borrow(borrowerB, borrowerB, oneMantissa.mul(new BN(1)), '0x', {from:borrowerB});
 		logGas("Private sale claim", privateSaleClaimRec);
-		logGas("Impermax vester claim", impermaxVesterClaimRec);
+		logGas(" Ampl vester claim", impermaxVesterClaimRec);
 		logGas("Farming pool first claim and advance", farmingPoolClaimFirstRec);
 		logGas("Farming pool second claim", farmingPoolClaimSecondRec);
 		logGas("Advance", advanceRec);
