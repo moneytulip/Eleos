@@ -149,7 +149,7 @@ contract('Highlevel', function (accounts) {
 		simpleUniswapOracle = await SimpleUniswapOracle.new();
 		const bDeployer = await BDeployer.new();
 		const cDeployer = await CDeployer.new();
-		impermaxFactory = await Factory.new(admin, address(0), bDeployer.address, cDeployer.address, uniswapV2Factory.address, simpleUniswapOracle.address);
+		impermaxFactory = await Factory.new(admin, address(0), bDeployer.address, cDeployer.address, simpleUniswapOracle.address);
 		ETH = await MockERC20.new('Ethereum', 'ETH');
 		UNI = await MockERC20.new('Uniswap', 'UNI');
 		DAI = await MockERC20.new('DAI', 'DAI');
