@@ -1,7 +1,7 @@
-pragma solidity >=0.5.0;
+pragma solidity >=0.8.9;
 
 interface IStakedLPToken01 {
-    /*** Impermax ERC20 ***/
+    /***  Ampl ERC20 ***/
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(

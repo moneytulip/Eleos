@@ -19,7 +19,7 @@ const DEADLINE = MAX_UINT_256;
 
 const MockERC20 = artifacts.require("MockERC20");
 const UniswapV2Factory = artifacts.require(
-  "test/Contracts/spooky/UniswapV2Factory.sol:UniswapV2Factory"
+  "test/Contracts/uniswap-v2-core/UniswapV2Factory.sol:UniswapV2Factory"
 );
 const UniswapV2Router02 = artifacts.require(
   "test/Contracts/spooky/UniswapV2Router02.sol:UniswapV2Router02"
