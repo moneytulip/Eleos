@@ -9,12 +9,12 @@
 pragma solidity =0.8.9;
 pragma experimental ABIEncoderV2;
 
-contract Imx {
+contract Ampl {
     /// @notice EIP-20 token name for this token
-    string public constant name = " Ampl";
+    string public constant name = "Ampl";
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = " Ampl";
+    string public constant symbol = "Ampl";
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;
