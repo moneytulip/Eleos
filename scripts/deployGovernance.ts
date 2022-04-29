@@ -4,19 +4,19 @@ import { ethers } from "hardhat";
 async function main() {
   const Ampl = await (
     await ethers.getContractFactory("Ampl")
-  ).deploy();
+  ).deploy(process.env.ADMIN_ADDRESS);
 
   logContractDeploy("Ampl", Ampl);
 
   await Ampl.deployed();
 
-  const claimsAggregator = await (
-    await ethers.getContractFactory("ClaimsAggregator")
+  const claimAggregator = await (
+    await ethers.getContractFactory("ClaimAggregator")
   ).deploy();
 
-  logContractDeploy("ClaimsAggregator", claimsAggregator);
+  logContractDeploy("ClaimsAggregator", claimAggregator);
 
-  await claimsAggregator.deployed();
+  await claimAggregator.deployed();
 
   console.log("Finished");
 }
