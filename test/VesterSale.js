@@ -5,7 +5,7 @@ const {
 	BN,
 } = require('./Utils/JS');
 
-const Imx = artifacts.require('Imx');
+const Imx = artifacts.require('Ampl');
 const VesterSale = artifacts.require('VesterSaleHarness');
 
 const oneMantissa = (new BN(10)).pow(new BN(18));

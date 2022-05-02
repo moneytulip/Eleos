@@ -12,7 +12,7 @@ const {
 	encode,
 } = require('./Utils/Ethereum');
 
-const Imx = artifacts.require('Imx');
+const Imx = artifacts.require('Ampl');
 const MockClaimable = artifacts.require('MockClaimable');
 const VesterStepped = artifacts.require('VesterSteppedHarness');
 const VesterOneStep = artifacts.require('VesterOneStep');
