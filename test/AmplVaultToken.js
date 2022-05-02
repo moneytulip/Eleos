@@ -65,6 +65,8 @@ contract("Spooky VaultToken Test", function (accounts) {
 
     await factory.createPair(token0.address, token1.address);
 
+    const { keccak256, toUtf8Bytes } = require("ethers").utils;
+    console.log('Pbytecode', keccak256(UniswapV2Pair.bytecode));
     const pair = await factory.getPair(token0.address, token1.address);
     console.log("Created pair at ", pair);
 
