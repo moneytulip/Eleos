@@ -19,13 +19,13 @@ const DEADLINE = MAX_UINT_256;
 
 const MockERC20 = artifacts.require("MockERC20");
 const UniswapV2Factory = artifacts.require(
-  "test/Contracts/uniswap-v2-core/UniswapV2Factory.sol:UniswapV2Factory"
+  "UniswapV2Factory"
 );
 const UniswapV2Router02 = artifacts.require(
-  "test/Contracts/spooky/UniswapV2Router02.sol:UniswapV2Router02"
+  "UniswapV2Router02"
 );
 const UniswapV2Pair = artifacts.require(
-  "test/Contracts/uniswap-v2-core/UniswapV2Pair.sol:UniswapV2Pair"
+  "UniswapV2Pair"
 );
 const EleosPriceOracle = artifacts.require("EleosPriceOracle");
 const Factory = artifacts.require("Factory");
@@ -36,7 +36,7 @@ const Borrowable = artifacts.require("Borrowable");
 const Router02 = artifacts.require("Router02");
 const WETH9 = artifacts.require("WETH9");
 const MasterChef = artifacts.require(
-  "test/Contracts/spooky/MasterChef.sol:MasterChef"
+  "MasterChef"
 );
 const VaultToken = artifacts.require("VaultToken");
 const VaultTokenFactory = artifacts.require("VaultTokenFactory");
