@@ -31,6 +31,8 @@ npx hardhat run scripts/deploy.ts --network localhost
 ### Governance Contracts on Rinkeby 
 - **Amps:** [0xC32aCe6aEE11342716A4Eb9efa98DC19E3184147](https://rinkeby.etherscan.io/address/0xC32aCe6aEE11342716A4Eb9efa98DC19E3184147#code)
 - **Claim Aggregator:** [0xeD9a19D1B62b00F945E64bE2d7d24D0c962fc9Ef](https://rinkeby.etherscan.io/address/0xeD9a19D1B62b00F945E64bE2d7d24D0c962fc9Ef#code)
+
+### LP Staking Contracts on Rinkeby 
 - **Testing MasterChef:** [0xd40AE31bAa11147682be30948D6257573c2F2029](https://rinkeby.etherscan.io/address/0xd40AE31bAa11147682be30948D6257573c2F2029#code)
 - Vault Token Factory: 0xF6c3cB5EB702F788B3826F802f1e8233cBe13ee9
 
