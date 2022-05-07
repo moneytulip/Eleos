@@ -38,7 +38,7 @@ const config: HardhatUserConfig = {
     },
     rinkeby: {
       chainId: 4,
-      url: "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
+      url: "https://rinkeby.infura.io/v3/30afe1c89595488cb279b0d8558064a8",
       accounts: [process.env.OASIS_PRIV_KEY ?? ''],
     }
   },

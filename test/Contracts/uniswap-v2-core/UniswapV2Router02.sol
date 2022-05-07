@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at FtmScan.com on 2021-04-26
+ */
+
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity =0.8.9;
 
@@ -370,18 +374,17 @@ library UniswapV2Library {
     ) internal pure returns (address pair) {
         (address token0, address token1) = sortTokens(tokenA, tokenB);
         pair = address(
-            uint160(
-            uint256(
+            uint160(uint256(
                 keccak256(
                     abi.encodePacked(
                         hex"ff",
                         factory,
                         keccak256(abi.encodePacked(token0, token1)),
-                        hex"0c00bd8b24f33edad5bfb85dd9cf28bbeb5d0cb609a6202eec4279c19fb46785" // init code hash
+                        hex"071e61758b448e44999c5f8e86e397dd824cc5e0aa945065cafdd46720866f1b"
                     )
                 )
-            ))
-        );
+            )
+        ));
     }
 
     // fetches and sorts the reserves for a pair
@@ -606,7 +609,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         _;
     }
 
-    constructor(address _factory, address _WETH) {
+    constructor(address _factory, address _WETH) public {
         factory = _factory;
         WETH = _WETH;
     }
