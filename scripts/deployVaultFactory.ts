@@ -2,18 +2,18 @@ import { Contract } from "@ethersproject/contracts";
 import { ethers } from "hardhat";
 
 async function main() {
-  const masterChef = await (
+  const vaultFactory = await (
     await ethers.getContractFactory("VaultTokenFactory")
   ).deploy(
     process.env.UNISWAP_ROUTER_ADDRESS,
     process.env.MASTER_CHEF_ADDRESS,
-    process.env.AMPL_ADDRESS,
-    950
+    process.env.REWARDS_TOKEN_ADDRESS,
+    901
   );
 
-  logContractDeploy("MasterChef", masterChef);
+  logContractDeploy("Vault Factory", vaultFactory);
 
-  await masterChef.deployed();
+  await vaultFactory.deployed();
 
   console.log("Finished");
 }
