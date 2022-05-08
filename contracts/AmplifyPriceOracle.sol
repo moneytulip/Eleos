@@ -86,7 +86,7 @@ contract AmplifyPriceOracle {
     {
         Pair memory pair = getPair[uniswapV2Pair];
         require(pair.initialized, "AmplifyPriceOracle: NOT_INITIALIZED");
-        Pair storage pairStorage = getPair[uniswapV2Pair];
+        // Pair storage pairStorage = getPair[uniswapV2Pair];
 
         uint32 blockTimestamp = getBlockTimestamp();
         uint32 lastUpdateTimestamp = pair.latestIsSlotA
