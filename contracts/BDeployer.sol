@@ -4,7 +4,7 @@ pragma solidity =0.8.9;
 import "./Borrowable.sol";
 import "./interfaces/IBDeployer.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 /*
  * This contract is used by the Factory to deploy Borrowable(s)
@@ -20,6 +20,6 @@ contract BDeployer is IBDeployer {
 		assembly {
 			borrowable := create2(0, add(bytecode, 32), mload(bytecode), salt)
 		}
-		console.log("BORROWABLE:", borrowable);
+		// console.log("BORROWABLE:", borrowable);
 	}
 }

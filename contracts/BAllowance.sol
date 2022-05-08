@@ -36,7 +36,7 @@ contract BAllowance is PoolToken, BStorage {
     ) internal {
         uint256 _borrowAllowance = borrowAllowance[owner][spender];
         if (spender != owner && _borrowAllowance != type(uint256).max) {
-            require(_borrowAllowance >= value, "Eleos: BORROW_NOT_ALLOWED");
+            require(_borrowAllowance >= value, "Amplify: BORROW_NOT_ALLOWED");
             borrowAllowance[owner][spender] = _borrowAllowance - value;
         }
     }

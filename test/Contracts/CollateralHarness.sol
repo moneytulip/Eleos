@@ -47,8 +47,8 @@ contract CollateralHarness is Collateral {
 		_price1 = price1;
 	}
 	
-	function setPriceOracle(address _eleosPriceOracle) external {
-		eleosPriceOracle = _eleosPriceOracle;
+	function setPriceOracle(address _amplifyPriceOracle) external {
+		amplifyPriceOracle = _amplifyPriceOracle;
 	}
 	
 	bool public useMockExchangeRate;

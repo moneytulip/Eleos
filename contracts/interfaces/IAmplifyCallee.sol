@@ -2,15 +2,15 @@
 
 pragma solidity >=0.8.9;
 
-interface IEleosCallee {
-    function eleosBorrow(
+interface IAmplifyCallee {
+    function amplifyBorrow(
         address sender,
         address borrower,
         uint256 borrowAmount,
         bytes calldata data
     ) external;
 
-    function eleosRedeem(
+    function amplifyRedeem(
         address sender,
         uint256 redeemAmount,
         bytes calldata data

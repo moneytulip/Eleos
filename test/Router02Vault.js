@@ -11,7 +11,7 @@ const {
   getAmounts,
   leverage,
   permitGenerator,
-} = require("./Utils/EleosPeriphery");
+} = require("./Utils/AmplifyPeriphery");
 const { keccak256, toUtf8Bytes } = require("ethers").utils;
 
 const MAX_UINT_256 = new BN(2).pow(new BN(256)).sub(new BN(1));
@@ -27,7 +27,7 @@ const UniswapV2Router02 = artifacts.require(
 const UniswapV2Pair = artifacts.require(
   "UniswapV2Pair"
 );
-const EleosPriceOracle = artifacts.require("EleosPriceOracle");
+const AmplifyPriceOracle = artifacts.require("AmplifyPriceOracle");
 const Factory = artifacts.require("Factory");
 const BDeployer = artifacts.require("BDeployer");
 const CDeployer = artifacts.require("CDeployer");
@@ -110,8 +110,8 @@ contract("Router02 Vault", function (accounts) {
   let uniswapV2Router02;
   let masterChef;
   let vaultTokenFactory;
-  let eleosPriceOracle;
-  let eleosFactory;
+  let amplifyPriceOracle;
+  let amplifyFactory;
   let WETH;
   let UNI;
   let uniswapV2Pair;
@@ -124,15 +124,15 @@ contract("Router02 Vault", function (accounts) {
     // Create base contracts
     rewardsToken = await MockERC20.new("", "");
     uniswapV2Factory = await UniswapV2Factory.new(address(0));
-    eleosPriceOracle = await EleosPriceOracle.new();
+    amplifyPriceOracle = await AmplifyPriceOracle.new();
     const bDeployer = await BDeployer.new();
     const cDeployer = await CDeployer.new();
-    eleosFactory = await Factory.new(
+    amplifyFactory = await Factory.new(
       address(0),
       address(0),
       bDeployer.address,
       cDeployer.address,
-      eleosPriceOracle.address
+      amplifyPriceOracle.address
     );
     WETH = await WETH9.new();
     uniswapV2Router02 = await UniswapV2Router02.new(
@@ -140,7 +140,7 @@ contract("Router02 Vault", function (accounts) {
       WETH.address
     );
     router = await Router02.new(
-      eleosFactory.address,
+      amplifyFactory.address,
       bDeployer.address,
       cDeployer.address,
       WETH.address
@@ -177,20 +177,20 @@ contract("Router02 Vault", function (accounts) {
     const vaultTokenAddress = await vaultTokenFactory.createVaultToken.call(0);
     await vaultTokenFactory.createVaultToken(0);
     vaultToken = await VaultToken.at(vaultTokenAddress);
-    // Create Pair On Eleos
-    collateralAddress = await eleosFactory.createCollateral.call(
+    // Create Pair On Amplify
+    collateralAddress = await amplifyFactory.createCollateral.call(
       vaultTokenAddress
     );
-    borrowable0Address = await eleosFactory.createBorrowable0.call(
+    borrowable0Address = await amplifyFactory.createBorrowable0.call(
       vaultTokenAddress
     );
-    borrowable1Address = await eleosFactory.createBorrowable1.call(
+    borrowable1Address = await amplifyFactory.createBorrowable1.call(
       vaultTokenAddress
     );
-    await eleosFactory.createCollateral(vaultTokenAddress);
-    await eleosFactory.createBorrowable0(vaultTokenAddress);
-    await eleosFactory.createBorrowable1(vaultTokenAddress);
-    await eleosFactory.initializeLendingPool(vaultTokenAddress);
+    await amplifyFactory.createCollateral(vaultTokenAddress);
+    await amplifyFactory.createBorrowable0(vaultTokenAddress);
+    await amplifyFactory.createBorrowable1(vaultTokenAddress);
+    await amplifyFactory.initializeLendingPool(vaultTokenAddress);
     collateral = await Collateral.at(collateralAddress);
     const borrowable0 = await Borrowable.at(borrowable0Address);
     const borrowable1 = await Borrowable.at(borrowable1Address);
@@ -232,8 +232,8 @@ contract("Router02 Vault", function (accounts) {
         t3.amountBMin
       ),
       ETH_IS_A
-        ? "EleosRouter: INSUFFICIENT_B_AMOUNT"
-        : "EleosRouter: INSUFFICIENT_A_AMOUNT"
+        ? "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
+        : "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
     );
     const t4 = getAmounts("10", "500", "6", "0", ETH_IS_A);
     await expectRevert(
@@ -245,8 +245,8 @@ contract("Router02 Vault", function (accounts) {
         t4.amountBMin
       ),
       ETH_IS_A
-        ? "EleosRouter: INSUFFICIENT_A_AMOUNT"
-        : "EleosRouter: INSUFFICIENT_B_AMOUNT"
+        ? "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
+        : "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
     );
   });
 
@@ -256,7 +256,7 @@ contract("Router02 Vault", function (accounts) {
       router.mint(borrowableUNI.address, UNI_LEND_AMOUNT, lender, "0", {
         from: lender,
       }),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert.unspecified(
       router.mint(borrowableUNI.address, UNI_LEND_AMOUNT, lender, DEADLINE, {
@@ -281,14 +281,14 @@ contract("Router02 Vault", function (accounts) {
         value: ETH_LEND_AMOUNT,
         from: lender,
       }),
-      "EleosRouter: NOT_WETH"
+      "AmplifyRouter: NOT_WETH"
     );
     await expectRevert(
       router.mintETH(borrowableWETH.address, lender, "0", {
         value: ETH_LEND_AMOUNT,
         from: lender,
       }),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     op = router.mintETH(borrowableWETH.address, lender, DEADLINE, {
       value: ETH_LEND_AMOUNT,
@@ -348,7 +348,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: lender }
       ),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert(
       router.redeem(
@@ -359,7 +359,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: lender }
       ),
-      "Eleos: TRANSFER_NOT_ALLOWED"
+      "Amplify: TRANSFER_NOT_ALLOWED"
     );
     const permitRedeemUNI = await permitGenerator.permit(
       borrowableUNI,
@@ -388,7 +388,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: lender }
       ),
-      "EleosRouter: NOT_WETH"
+      "AmplifyRouter: NOT_WETH"
     );
     await expectRevert(
       router.redeemETH(
@@ -399,7 +399,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: lender }
       ),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert(
       router.redeemETH(
@@ -410,7 +410,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: lender }
       ),
-      "Eleos: TRANSFER_NOT_ALLOWED"
+      "Amplify: TRANSFER_NOT_ALLOWED"
     );
     const permitRedeemETH = await permitGenerator.permit(
       borrowableWETH,
@@ -490,7 +490,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: borrower }
       ),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert(
       router.borrow(
@@ -501,7 +501,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: borrower }
       ),
-      "Eleos: BORROW_NOT_ALLOWED"
+      "Amplify: BORROW_NOT_ALLOWED"
     );
     const permitBorrowUNI = await permitGenerator.borrowPermit(
       borrowableUNI,
@@ -536,7 +536,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: borrower }
       ),
-      "EleosRouter: NOT_WETH"
+      "AmplifyRouter: NOT_WETH"
     );
     await expectRevert(
       router.borrowETH(
@@ -547,7 +547,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: borrower }
       ),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert(
       router.borrowETH(
@@ -558,7 +558,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: borrower }
       ),
-      "Eleos: BORROW_NOT_ALLOWED"
+      "Amplify: BORROW_NOT_ALLOWED"
     );
     const permitBorrowETH = await permitGenerator.borrowPermit(
       borrowableWETH,
@@ -590,7 +590,7 @@ contract("Router02 Vault", function (accounts) {
       router.repay(borrowableUNI.address, UNI_REPAY_AMOUNT1, borrower, "0", {
         from: borrower,
       }),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert.unspecified(
       router.repay(
@@ -635,14 +635,14 @@ contract("Router02 Vault", function (accounts) {
         value: ETH_REPAY_AMOUNT1,
         from: borrower,
       }),
-      "EleosRouter: NOT_WETH"
+      "AmplifyRouter: NOT_WETH"
     );
     await expectRevert(
       router.repayETH(borrowableWETH.address, borrower, "0", {
         value: ETH_REPAY_AMOUNT1,
         from: borrower,
       }),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     const actualRepayETH = await router.repayETH.call(
       borrowableWETH.address,
@@ -734,8 +734,8 @@ contract("Router02 Vault", function (accounts) {
         ETH_IS_A
       ),
       ETH_IS_A
-        ? "EleosRouter: INSUFFICIENT_A_AMOUNT"
-        : "EleosRouter: INSUFFICIENT_B_AMOUNT"
+        ? "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
+        : "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
     );
     await expectRevert(
       leverage(
@@ -751,8 +751,8 @@ contract("Router02 Vault", function (accounts) {
         ETH_IS_A
       ),
       ETH_IS_A
-        ? "EleosRouter: INSUFFICIENT_B_AMOUNT"
-        : "EleosRouter: INSUFFICIENT_A_AMOUNT"
+        ? "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
+        : "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
     );
     await expectRevert(
       leverage(
@@ -767,7 +767,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         ETH_IS_A
       ),
-      "Eleos: BORROW_NOT_ALLOWED"
+      "Amplify: BORROW_NOT_ALLOWED"
     );
 
     const permitBorrowUNIHigh = await permitGenerator.borrowPermit(
@@ -797,7 +797,7 @@ contract("Router02 Vault", function (accounts) {
         permitBorrowUNIHigh,
         ETH_IS_A
       ),
-      "Eleos: INSUFFICIENT_LIQUIDITY"
+      "Amplify: INSUFFICIENT_LIQUIDITY"
     );
 
     const balancePrior = await collateral.balanceOf(borrower);
@@ -858,7 +858,7 @@ contract("Router02 Vault", function (accounts) {
       address(0),
       "0x"
     );
-    await eleosPriceOracle.getResult(vaultToken.address);
+    await amplifyPriceOracle.getResult(vaultToken.address);
     await expectRevert(
       router.liquidate(
         borrowableUNI.address,
@@ -868,7 +868,7 @@ contract("Router02 Vault", function (accounts) {
         DEADLINE,
         { from: liquidator }
       ),
-      "Eleos: INSUFFICIENT_SHORTFALL"
+      "Amplify: INSUFFICIENT_SHORTFALL"
     );
     await increaseTime(3700);
     await borrowableUNI.accrueInterest();
@@ -883,7 +883,7 @@ contract("Router02 Vault", function (accounts) {
       router.liquidate(borrowableUNI.address, "0", borrower, liquidator, "0", {
         from: liquidator,
       }),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     await expectRevert.unspecified(
       router.liquidate(
@@ -942,14 +942,14 @@ contract("Router02 Vault", function (accounts) {
         DEADLINE,
         { value: ETH_LIQUIDATE_AMOUNT, from: liquidator }
       ),
-      "EleosRouter: NOT_WETH"
+      "AmplifyRouter: NOT_WETH"
     );
     await expectRevert(
       router.liquidateETH(borrowableWETH.address, borrower, liquidator, "0", {
         value: ETH_LIQUIDATE_AMOUNT,
         from: liquidator,
       }),
-      "EleosRouter: EXPIRED"
+      "AmplifyRouter: EXPIRED"
     );
     const liquidateETHResult = await router.liquidateETH.call(
       borrowableWETH.address,
@@ -1009,10 +1009,10 @@ contract("Router02 Vault", function (accounts) {
     await checkETHBalance(op2, liquidator, expectedETHAmount, true);
   });
 
-  it("eleosBorrow is forbidden to non-borrowable", async () => {
+  it("amplifyBorrow is forbidden to non-borrowable", async () => {
     // Fails because data cannot be empty
     await expectRevert.unspecified(
-      router.eleosBorrow(router.address, address(0), "0", "0x")
+      router.amplifyBorrow(router.address, address(0), "0", "0x")
     );
     const data = encode(
       ["uint8", "address", "uint8", "bytes"],
@@ -1020,21 +1020,21 @@ contract("Router02 Vault", function (accounts) {
     );
     // Fails becasue msg.sender is not a borrowable
     await expectRevert(
-      router.eleosBorrow(router.address, address(0), "0", data),
-      "EleosRouter: UNAUTHORIZED_CALLER"
+      router.amplifyBorrow(router.address, address(0), "0", data),
+      "AmplifyRouter: UNAUTHORIZED_CALLER"
     );
     // Fails because sender is not the router
     const borrowableA = ETH_IS_A ? borrowableWETH : borrowableUNI;
     await expectRevert(
       borrowableA.borrow(borrower, router.address, "0", data),
-      "EleosRouter: SENDER_NOT_ROUTER"
+      "AmplifyRouter: SENDER_NOT_ROUTER"
     );
   });
 
-  it("eleosRedeem is forbidden to non-collateral", async () => {
+  it("amplifyRedeem is forbidden to non-collateral", async () => {
     // Fails because data cannot be empty
     await expectRevert.unspecified(
-      router.eleosRedeem(router.address, "0", "0x")
+      router.amplifyRedeem(router.address, "0", "0x")
     );
     const data = encode(
       ["uint8", "address", "uint8", "bytes"],
@@ -1042,13 +1042,13 @@ contract("Router02 Vault", function (accounts) {
     );
     // Fails becasue msg.sender is not a borrowable
     await expectRevert(
-      router.eleosRedeem(router.address, "0", data),
-      "EleosRouter: UNAUTHORIZED_CALLER"
+      router.amplifyRedeem(router.address, "0", data),
+      "AmplifyRouter: UNAUTHORIZED_CALLER"
     );
     // Fails because sender is not the router
     await expectRevert(
       collateral.flashRedeem(router.address, "0", data),
-      "EleosRouter: SENDER_NOT_ROUTER"
+      "AmplifyRouter: SENDER_NOT_ROUTER"
     );
   });
 
@@ -1094,7 +1094,7 @@ contract("Router02 Vault", function (accounts) {
         "0x",
         { from: lender }
       ),
-      "Eleos: TRANSFER_NOT_ALLOWED"
+      "Amplify: TRANSFER_NOT_ALLOWED"
     );
     expect((await borrowableWETH.allowance(lender, router.address)) * 1).to.eq(
       0

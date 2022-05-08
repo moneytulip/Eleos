@@ -7,7 +7,7 @@ import "./libraries/SafeMath.sol";
 // This contract is basically UniswapV2ERC20 with small modifications
 // src: https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol
 
-abstract contract EleosERC20 {
+abstract contract AmplifyERC20 {
     using SafeMath for uint256;
 
     string public name;
@@ -77,7 +77,7 @@ abstract contract EleosERC20 {
     ) virtual internal {
         balanceOf[from] = balanceOf[from].sub(
             value,
-            "Eleos: TRANSFER_TOO_HIGH"
+            "Amplify: TRANSFER_TOO_HIGH"
         );
         balanceOf[to] = balanceOf[to].add(value);
         emit Transfer(from, to, value);
@@ -101,7 +101,7 @@ abstract contract EleosERC20 {
         if (allowance[from][msg.sender] != type(uint256).max) {
             allowance[from][msg.sender] = allowance[from][msg.sender].sub(
                 value,
-                "Eleos: TRANSFER_NOT_ALLOWED"
+                "Amplify: TRANSFER_NOT_ALLOWED"
             );
         }
         _transfer(from, to, value);
@@ -118,14 +118,14 @@ abstract contract EleosERC20 {
         bytes32 s,
         bytes32 typehash
     ) internal {
-        require(deadline >= block.timestamp, "Eleos: EXPIRED");
+        require(deadline >= block.timestamp, "Amplify: EXPIRED");
         bytes32 hashStruct = keccak256(abi.encode(typehash, owner, spender, value, nonces[owner]++, deadline));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, hashStruct));
         address recoveredOwner = ecrecover(digest, v, r, s);
 
         require(
             recoveredOwner != address(0) && recoveredOwner == owner,
-            "Eleos: INVALID_SIGNATURE"
+            "Amplify: INVALID_SIGNATURE"
         );
     }
 

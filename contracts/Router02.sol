@@ -7,7 +7,7 @@ import "./interfaces/IRouter02.sol";
 import "./interfaces/IPoolToken.sol";
 import "./interfaces/IBorrowable.sol";
 import "./interfaces/ICollateral.sol";
-import "./interfaces/IEleosCallee.sol";
+import "./interfaces/IAmplifyCallee.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IVaultToken.sol";
 import "./interfaces/IWETH.sol";
@@ -15,7 +15,10 @@ import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/SafeMath.sol";
 import "./libraries/TransferHelper.sol";
 
-contract Router02 is IRouter02, IEleosCallee {
+import "./Borrowable.sol";
+import "./Collateral.sol";
+
+contract Router02 is IRouter02, IAmplifyCallee {
     using SafeMath for uint256;
 
     address public immutable override factory;
@@ -24,14 +27,14 @@ contract Router02 is IRouter02, IEleosCallee {
     address public immutable override WETH;
 
     modifier ensure(uint256 deadline) {
-        require(deadline >= block.timestamp, "EleosRouter: EXPIRED");
+        require(deadline >= block.timestamp, "AmplifyRouter: EXPIRED");
         _;
     }
 
     modifier checkETH(address poolToken) {
         require(
             WETH == IPoolToken(poolToken).underlying(),
-            "EleosRouter: NOT_WETH"
+            "AmplifyRouter: NOT_WETH"
         );
         _;
     }
@@ -422,7 +425,7 @@ contract Router02 is IRouter02, IEleosCallee {
     ) external virtual override ensure(deadline) {
         address collateral = getCollateral(underlying);
         uint256 exchangeRate = ICollateral(collateral).exchangeRate();
-        require(redeemTokens > 0, "EleosRouter: REDEEM_ZERO");
+        require(redeemTokens > 0, "AmplifyRouter: REDEEM_ZERO");
         uint256 redeemAmount = (redeemTokens - 1).mul(exchangeRate).div(1e18);
         _permit(collateral, redeemTokens, deadline, permitData);
         bytes memory redeemData = abi.encode(
@@ -472,8 +475,8 @@ contract Router02 is IRouter02, IEleosCallee {
             IVaultToken(underlying).redeem(uniswapV2Pair);
         (uint256 amountAMax, uint256 amountBMax) = IUniswapV2Pair(uniswapV2Pair)
             .burn(address(this));
-        require(amountAMax >= amountAMin, "EleosRouter: INSUFFICIENT_A_AMOUNT");
-        require(amountBMax >= amountBMin, "EleosRouter: INSUFFICIENT_B_AMOUNT");
+        require(amountAMax >= amountAMin, "AmplifyRouter: INSUFFICIENT_A_AMOUNT");
+        require(amountBMax >= amountBMin, "AmplifyRouter: INSUFFICIENT_B_AMOUNT");
         // repay and refund
         _repayAndRefund(borrowableA, tokenA, borrower, amountAMax);
         _repayAndRefund(borrowableB, tokenB, borrower, amountBMax);
@@ -505,7 +508,7 @@ contract Router02 is IRouter02, IEleosCallee {
         }
     }
 
-    /*** Eleos Callee ***/
+    /*** Amplify Callee ***/
 
     enum CallType {
         ADD_LIQUIDITY_AND_MINT,
@@ -537,7 +540,7 @@ contract Router02 is IRouter02, IEleosCallee {
         uint256 amountBMin;
     }
 
-    function eleosBorrow(
+    function amplifyBorrow(
         address sender,
         address borrower,
         uint256 borrowAmount,
@@ -551,10 +554,10 @@ contract Router02 is IRouter02, IEleosCallee {
             calleeData.borrowableIndex
         );
         // only succeeds if called by a borrowable and if that borrowable has been called by the router
-        require(sender == address(this), "EleosRouter: SENDER_NOT_ROUTER");
+        require(sender == address(this), "AmplifyRouter: SENDER_NOT_ROUTER");
         require(
             msg.sender == declaredCaller,
-            "EleosRouter: UNAUTHORIZED_CALLER"
+            "AmplifyRouter: UNAUTHORIZED_CALLER"
         );
         if (calleeData.callType == CallType.ADD_LIQUIDITY_AND_MINT) {
             AddLiquidityAndMintCalldata memory d = abi.decode(
@@ -583,7 +586,7 @@ contract Router02 is IRouter02, IEleosCallee {
     }
     
 
-    function eleosRedeem(
+    function amplifyRedeem(
         address sender,
         uint256 redeemAmount,
         bytes calldata data
@@ -592,10 +595,10 @@ contract Router02 is IRouter02, IEleosCallee {
         CalleeData memory calleeData = abi.decode(data, (CalleeData));
         address declaredCaller = getCollateral(calleeData.underlying);
         // only succeeds if called by a collateral and if that collateral has been called by the router
-        require(sender == address(this), "EleosRouter: SENDER_NOT_ROUTER");
+        require(sender == address(this), "AmplifyRouter: SENDER_NOT_ROUTER");
         require(
             msg.sender == declaredCaller,
-            "EleosRouter: UNAUTHORIZED_CALLER"
+            "AmplifyRouter: UNAUTHORIZED_CALLER"
         );
         if (calleeData.callType == CallType.REMOVE_LIQ_AND_REPAY) {
             RemoveLiqAndRepayCalldata memory d = abi.decode(
@@ -674,7 +677,7 @@ contract Router02 is IRouter02, IEleosCallee {
         if (amountBOptimal <= amountBDesired) {
             require(
                 amountBOptimal >= amountBMin,
-                "EleosRouter: INSUFFICIENT_B_AMOUNT"
+                "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
             );
             (amountA, amountB) = (amountADesired, amountBOptimal);
         } else {
@@ -682,7 +685,7 @@ contract Router02 is IRouter02, IEleosCallee {
             assert(amountAOptimal <= amountADesired);
             require(
                 amountAOptimal >= amountAMin,
-                "EleosRouter: INSUFFICIENT_A_AMOUNT"
+                "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
             );
             (amountA, amountB) = (amountAOptimal, amountBDesired);
         }
@@ -694,10 +697,10 @@ contract Router02 is IRouter02, IEleosCallee {
         uint256 reserveA,
         uint256 reserveB
     ) internal pure returns (uint256 amountB) {
-        require(amountA > 0, "EleosRouter: INSUFFICIENT_AMOUNT");
+        require(amountA > 0, "AmplifyRouter: INSUFFICIENT_AMOUNT");
         require(
             reserveA > 0 && reserveB > 0,
-            "EleosRouter: INSUFFICIENT_LIQUIDITY"
+            "AmplifyRouter: INSUFFICIENT_LIQUIDITY"
         );
         amountB = amountA.mul(reserveB) / reserveA;
     }
@@ -738,7 +741,7 @@ contract Router02 is IRouter02, IEleosCallee {
         override
         returns (address borrowable)
     {
-        require(index < 2, "EleosRouter: INDEX_TOO_HIGH");
+        require(index < 2, "AmplifyRouter: INDEX_TOO_HIGH");
         borrowable = address(
             uint160(
                 uint256(
@@ -747,7 +750,8 @@ contract Router02 is IRouter02, IEleosCallee {
                             hex"ff",
                             bDeployer,
                             keccak256(abi.encodePacked(factory, underlying, index)),
-                            hex"1cfd3647076ae4cbba108df6563a88d82cbbedc15e0f4adbfae5c9dd095ad3e1" // Borrowable bytecode keccak256
+                            bytes32(keccak256(abi.encodePacked(type(Borrowable).creationCode)))
+                            // hex"1cfd3647076ae4cbba108df6563a88d82cbbedc15e0f4adbfae5c9dd095ad3e1" // Borrowable bytecode keccak256
                         )
                     )
                 )
@@ -770,7 +774,8 @@ contract Router02 is IRouter02, IEleosCallee {
                             hex"ff",
                             cDeployer,
                             keccak256(abi.encodePacked(factory, underlying)),
-                            hex"00ddbb9d4ffaabb731114d43f5e811c59bec0d662edc5b3fd873e93ca7289426" // Collateral bytecode keccak256
+                            bytes32(keccak256(abi.encodePacked(type(Collateral).creationCode)))
+                            // hex"aaca94938eb3028bfbb94c0f3cc9d22396f81010b4ed39936666863788b8bf24" // Collateral bytecode keccak256
                         )
                     )
                 )

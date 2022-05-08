@@ -8,7 +8,7 @@ import "./BSetter.sol";
 import "./BStorage.sol";
 import "./interfaces/IBorrowable.sol";
 import "./interfaces/ICollateral.sol";
-import "./interfaces/IEleosCallee.sol";
+import "./interfaces/IAmplifyCallee.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IFactory.sol";
 import "./interfaces/IBorrowTracker.sol";
@@ -178,13 +178,13 @@ contract Borrowable is
         bytes calldata data
     ) external nonReentrant update accrue {
         uint256 _totalBalance = totalBalance;
-        require(borrowAmount <= _totalBalance, "Eleos: INSUFFICIENT_CASH");
+        require(borrowAmount <= _totalBalance, "Amplify: INSUFFICIENT_CASH");
         _checkBorrowAllowance(borrower, msg.sender, borrowAmount);
 
         // optimistically transfer funds
         if (borrowAmount > 0) _safeTransfer(receiver, borrowAmount);
         if (data.length > 0)
-            IEleosCallee(receiver).eleosBorrow(
+            IAmplifyCallee(receiver).amplifyBorrow(
                 msg.sender,
                 borrower,
                 borrowAmount,
@@ -208,7 +208,7 @@ contract Borrowable is
                     address(this),
                     accountBorrows
                 ),
-                "Eleos: INSUFFICIENT_LIQUIDITY"
+                "Amplify: INSUFFICIENT_LIQUIDITY"
             );
 
         emit Borrow(

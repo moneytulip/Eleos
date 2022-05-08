@@ -7,8 +7,8 @@ import "./CSetter.sol";
 import "./interfaces/IBorrowable.sol";
 import "./interfaces/ICollateral.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/IEleosPriceOracle.sol";
-import "./interfaces/IEleosCallee.sol";
+import "./interfaces/IAmplifyPriceOracle.sol";
+import "./interfaces/IAmplifyCallee.sol";
 import "./interfaces/IUniswapV2Pair.sol";
 import "./libraries/UQ112x112.sol";
 import "./libraries/Math.sol";
@@ -27,7 +27,7 @@ contract Collateral is PoolToken, CStorage, CSetter {
         virtual
         returns (uint256 price0, uint256 price1)
     {
-        (uint224 twapPrice112x112, ) = IEleosPriceOracle(eleosPriceOracle)
+        (uint224 twapPrice112x112, ) = IAmplifyPriceOracle(amplifyPriceOracle)
             .getResult(underlying);
         return _computePrice(twapPrice112x112);
     }
@@ -77,7 +77,7 @@ contract Collateral is PoolToken, CStorage, CSetter {
         address to,
         uint256 value
     ) internal override {
-        require(tokensUnlocked(from, value), "Eleos: INSUFFICIENT_LIQUIDITY");
+        require(tokensUnlocked(from, value), "Amplify: INSUFFICIENT_LIQUIDITY");
         super._transfer(from, to, value);
     }
 
@@ -167,8 +167,8 @@ contract Collateral is PoolToken, CStorage, CSetter {
          * reserve0 / reserve1 is close to 2**112 or 1/2**112
          * We're going to prevent users from using pairs at risk from the UI
          */
-        require(price0 > 100, "Eleos: PRICE_CALCULATION_ERROR");
-        require(price1 > 100, "Eleos: PRICE_CALCULATION_ERROR");
+        require(price0 > 100, "Amplify: PRICE_CALCULATION_ERROR");
+        require(price1 > 100, "Amplify: PRICE_CALCULATION_ERROR");
     }
 
     function accountLiquidityStale(address borrower)
@@ -182,7 +182,7 @@ contract Collateral is PoolToken, CStorage, CSetter {
         uint256 amountCollateral = balanceOf[borrower].mul(exchangeRate()).div(
             1e18
         );
-        (uint224 twapPrice112x112, ) = IEleosPriceOracle(eleosPriceOracle)
+        (uint224 twapPrice112x112, ) = IAmplifyPriceOracle(amplifyPriceOracle)
             .getResultStale(underlying);
         (uint256 price0, uint256 price1) = _computePrice(twapPrice112x112);
 
@@ -205,7 +205,7 @@ contract Collateral is PoolToken, CStorage, CSetter {
         address _borrowable1 = borrowable1;
         require(
             borrowable == _borrowable0 || borrowable == _borrowable1,
-            "Eleos: INVALID_BORROWABLE"
+            "Amplify: INVALID_BORROWABLE"
         );
         uint256 amount0 = borrowable == _borrowable0
             ? accountBorrows
@@ -229,11 +229,11 @@ contract Collateral is PoolToken, CStorage, CSetter {
     ) external returns (uint256 seizeTokens) {
         require(
             msg.sender == borrowable0 || msg.sender == borrowable1,
-            "Eleos: UNAUTHORIZED"
+            "Amplify: UNAUTHORIZED"
         );
 
         (, uint256 shortfall) = accountLiquidity(borrower);
-        require(shortfall > 0, "Eleos: INSUFFICIENT_SHORTFALL");
+        require(shortfall > 0, "Amplify: INSUFFICIENT_SHORTFALL");
 
         uint256 price;
         if (msg.sender == borrowable0) (price, ) = getPrices();
@@ -247,7 +247,7 @@ contract Collateral is PoolToken, CStorage, CSetter {
 
         balanceOf[borrower] = balanceOf[borrower].sub(
             seizeTokens,
-            "Eleos: LIQUIDATING_TOO_MUCH"
+            "Amplify: LIQUIDATING_TOO_MUCH"
         );
         balanceOf[liquidator] = balanceOf[liquidator].add(seizeTokens);
         emit Transfer(borrower, liquidator, seizeTokens);
@@ -259,12 +259,12 @@ contract Collateral is PoolToken, CStorage, CSetter {
         uint256 redeemAmount,
         bytes calldata data
     ) external nonReentrant update {
-        require(redeemAmount <= totalBalance, "Eleos: INSUFFICIENT_CASH");
+        require(redeemAmount <= totalBalance, "Amplify: INSUFFICIENT_CASH");
 
         // optimistically transfer funds
         _safeTransfer(redeemer, redeemAmount);
         if (data.length > 0)
-            IEleosCallee(redeemer).eleosRedeem(msg.sender, redeemAmount, data);
+            IAmplifyCallee(redeemer).amplifyRedeem(msg.sender, redeemAmount, data);
 
         uint256 redeemTokens = balanceOf[address(this)];
         uint256 declaredRedeemTokens = redeemAmount
@@ -273,7 +273,7 @@ contract Collateral is PoolToken, CStorage, CSetter {
             .add(1); // rounded up
         require(
             redeemTokens >= declaredRedeemTokens,
-            "Eleos: INSUFFICIENT_REDEEM_TOKENS"
+            "Amplify: INSUFFICIENT_REDEEM_TOKENS"
         );
 
         _burn(address(this), redeemTokens);

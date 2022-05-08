@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT-License
 pragma solidity =0.8.9;
 
-import "../../contracts/interfaces/IEleosCallee.sol";
+import "../../contracts/interfaces/IAmplifyCallee.sol";
 import "./Recipient.sol";
 
-contract EleosCallee is IEleosCallee {
+contract AmplifyCallee is IAmplifyCallee {
     address recipient;
     address underlying;
 
@@ -13,7 +13,7 @@ contract EleosCallee is IEleosCallee {
         underlying = _underlying;
     }
 
-    function eleosBorrow(
+    function amplifyBorrow(
         address sender,
         address borrower,
         uint256 borrowAmount,
@@ -26,7 +26,7 @@ contract EleosCallee is IEleosCallee {
         Recipient(recipient).empty(underlying, msg.sender);
     }
 
-    function eleosRedeem(
+    function amplifyRedeem(
         address sender,
         uint256 redeemAmount,
         bytes calldata data

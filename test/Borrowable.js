@@ -1,14 +1,14 @@
 const {
 	Borrowable,
 	Collateral,
-	EleosCallee,
+	AmplifyCallee,
 	ReentrantCallee,
 	Recipient,
 	MockBorrowTracker,
 	makeFactory,
 	makeUniswapV2Pair,
 	makeErc20Token,
-} = require('./Utils/Eleos');
+} = require('./Utils/Amplify');
 const {
 	expectAlmostEqualMantissa,
 	expectRevert,
@@ -125,7 +125,7 @@ contract('Borrowable', function (accounts) {
 			expect(await borrowable.borrowAllowance(borrower, root) * 1).to.eq(borrowAmount * 1);
 			const borrowAction = borrowable.borrow(borrower, receiver, borrowAmount, '0x1');
 			if (maxBorrowable.lt(expectedAccountBorrows)) {
-				await expectRevert(borrowAction, 'Eleos: INSUFFICIENT_LIQUIDITY');
+				await expectRevert(borrowAction, 'Amplify: INSUFFICIENT_LIQUIDITY');
 				return false;
 			}
 			const receipt = await borrowAction;
@@ -162,7 +162,7 @@ contract('Borrowable', function (accounts) {
 			underlying = await makeErc20Token();
 			collateral = await Collateral.new();
 			recipient = await Recipient.new();
-			receiver = (await EleosCallee.new(recipient.address, underlying.address)).address;
+			receiver = (await AmplifyCallee.new(recipient.address, underlying.address)).address;
 			borrowTracker = await MockBorrowTracker.new();
 			await borrowable.setUnderlyingHarness(underlying.address);
 			await borrowable.setCollateralHarness(collateral.address);
@@ -173,13 +173,13 @@ contract('Borrowable', function (accounts) {
 		it(`fail if cash is insufficient`, async () => {
 			await underlying.setBalanceHarness(borrowable.address, '0');
 			await borrowable.sync();
-			await expectRevert(borrowable.borrow(borrower, receiver, '1', '0x'), 'Eleos: INSUFFICIENT_CASH');			
+			await expectRevert(borrowable.borrow(borrower, receiver, '1', '0x'), 'Amplify: INSUFFICIENT_CASH');			
 		});
 
 		it(`fail if not allowed`, async () => {
 			await underlying.setBalanceHarness(borrowable.address, '1');
 			await borrowable.sync();
-			await expectRevert(borrowable.borrow(borrower, receiver, '1', '0x'), 'Eleos: BORROW_NOT_ALLOWED');			
+			await expectRevert(borrowable.borrow(borrower, receiver, '1', '0x'), 'Amplify: BORROW_NOT_ALLOWED');			
 		});
 
 		it(`borrow succeds with enough collateral`, async () => {
@@ -292,14 +292,14 @@ contract('Borrowable', function (accounts) {
 		
 		it(`fail if shortfall is insufficient`, async () => {
 			await collateral.setAccountLiquidityHarness(borrower, '0', '0');
-			await expectRevert(borrowable.liquidate(borrower, liquidator), "Eleos: INSUFFICIENT_SHORTFALL");		
+			await expectRevert(borrowable.liquidate(borrower, liquidator), "Amplify: INSUFFICIENT_SHORTFALL");		
 		});
 		
 		it(`fail if there is not enough collateral`, async () => {
 			await collateral.setAccountLiquidityHarness(borrower, '0', '1');
 			await pretendHasBorrowed( borrower, repayAmount.mul(new BN(101)).div(new BN(100)) );
 			await underlying.setBalanceHarness( borrowable.address, repayAmount.mul(new BN(101)).div(new BN(100)) );
-			await expectRevert(borrowable.liquidate(borrower, liquidator), "Eleos: LIQUIDATING_TOO_MUCH");		
+			await expectRevert(borrowable.liquidate(borrower, liquidator), "Amplify: LIQUIDATING_TOO_MUCH");		
 		});
 		
 		it(`repayAmount equal accountBorrows`, async () => {
@@ -473,12 +473,12 @@ contract('Borrowable', function (accounts) {
 		});
 		
 		it(`borrow reentrancy`, async () => {
-			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [1])), 'Eleos: REENTERED');
-			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [2])), 'Eleos: REENTERED');
-			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [3])), 'Eleos: REENTERED');
-			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [4])), 'Eleos: REENTERED');
-			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [5])), 'Eleos: REENTERED');
-			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [6])), 'Eleos: REENTERED');
+			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [1])), 'Amplify: REENTERED');
+			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [2])), 'Amplify: REENTERED');
+			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [3])), 'Amplify: REENTERED');
+			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [4])), 'Amplify: REENTERED');
+			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [5])), 'Amplify: REENTERED');
+			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [6])), 'Amplify: REENTERED');
 			await expectRevert(borrowable.borrow(address(0), receiver, '0', encode(['uint'], [0])), 'TEST');
 		});
 	});
