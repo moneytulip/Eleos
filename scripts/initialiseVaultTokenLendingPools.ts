@@ -7,27 +7,27 @@ const toWei = (amount: Number, decimal = 18) => {
 };
 
 async function createStakedLendingPool(vaultToken: string) {
-  const eleosFactory = await ethers.getContractAt(
+  const amplifyFactory = await ethers.getContractAt(
     "Factory",
     process.env.FACTORY_ADDRESS ?? ""
   );
 
   let tx;
-  // tx = await eleosFactory.createCollateral(vaultToken);
+  // tx = await amplifyFactory.createCollateral(vaultToken);
   // console.log(tx);
   // await tx.wait();
-  const lendingPool = await eleosFactory.getLendingPool(vaultToken);
+  const lendingPool = await amplifyFactory.getLendingPool(vaultToken);
   // console.log('Lending pool', lendingPool);
-  // tx = await eleosFactory.createBorrowable0(vaultToken);
+  // tx = await amplifyFactory.createBorrowable0(vaultToken);
   // await tx.wait();
   // console.log('B0')
-  // tx = await eleosFactory.createBorrowable1(vaultToken);
+  // tx = await amplifyFactory.createBorrowable1(vaultToken);
   // await tx.wait();
   // console.log('B1')
-  // tx = await eleosFactory.initializeLendingPool(vaultToken);
+  // tx = await amplifyFactory.initializeLendingPool(vaultToken);
 
   const oracle = await ethers.getContractAt(
-    "EleosPriceOracle",
+    "AmplifyPriceOracle",
     "0xD1eb5077de2a4eF1f75941B5eA6ebfb5Cb0B0198"
   );
   

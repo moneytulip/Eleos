@@ -6,7 +6,7 @@ import "./IMasterChef.sol";
 import "./IUniswapV2Router01.sol";
 
 interface IVaultToken {
-    /*** Eleos ERC20 ***/
+    /*** Amplify ERC20 ***/
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(

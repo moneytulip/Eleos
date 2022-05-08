@@ -3,12 +3,12 @@ pragma solidity =0.8.9;
 
 import "../../contracts/interfaces/IBorrowable.sol";
 import "../../contracts/interfaces/ICollateral.sol";
-import "../../contracts/interfaces/IEleosCallee.sol";
+import "../../contracts/interfaces/IAmplifyCallee.sol";
 
-contract ReentrantCallee is IEleosCallee {
+contract ReentrantCallee is IAmplifyCallee {
     constructor() public {}
 
-    function eleosBorrow(
+    function amplifyBorrow(
         address sender,
         address borrower,
         uint256 borrowAmount,
@@ -29,7 +29,7 @@ contract ReentrantCallee is IEleosCallee {
         else if (i == 7) IBorrowable(msg.sender).underlying();
     }
 
-    function eleosRedeem(
+    function amplifyRedeem(
         address sender,
         uint256 redeemAmount,
         bytes calldata data

@@ -1,9 +1,9 @@
 const {
-	EleosERC20,
+	AmplifyERC20,
 	getDomainSeparator,
 	getApprovalDigest,
 	sendPermit,
-} = require('./Utils/Eleos');
+} = require('./Utils/Amplify');
 const {
 	expectEqual,
 	expectRevert,
@@ -18,7 +18,7 @@ const TOTAL_SUPPLY = new BN(1000);
 const TEST_AMOUNT = new BN(200);
 const MAX_UINT_256 = (new BN(2)).pow(new BN(256)).sub(new BN(1));
 
-contract('EleosERC20', function (accounts) {
+contract('AmplifyERC20', function (accounts) {
 	let root = accounts[0];
 	let user = accounts[1];
 	let other = accounts[2];
@@ -43,7 +43,7 @@ contract('EleosERC20', function (accounts) {
 	});
 	
 	beforeEach(async () => {
-		token = await EleosERC20.new(NAME, SYMBOL);
+		token = await AmplifyERC20.new(NAME, SYMBOL);
 		await token.mint(user, TOTAL_SUPPLY);
 	});
 
@@ -81,8 +81,8 @@ contract('EleosERC20', function (accounts) {
 	});
 
 	it('transfer:fail', async () => {
-		await expectRevert(token.transfer(other, TOTAL_SUPPLY.add(new BN(1)), {from: user}), 'Eleos: TRANSFER_TOO_HIGH');
-		await expectRevert(token.transfer(user, "1", {from: other}), 'Eleos: TRANSFER_TOO_HIGH');
+		await expectRevert(token.transfer(other, TOTAL_SUPPLY.add(new BN(1)), {from: user}), 'Amplify: TRANSFER_TOO_HIGH');
+		await expectRevert(token.transfer(user, "1", {from: other}), 'Amplify: TRANSFER_TOO_HIGH');
 	});
 
 	it('transferFrom', async () => {
@@ -112,7 +112,7 @@ contract('EleosERC20', function (accounts) {
 	});
 
 	it('transferFrom:fail', async () => {
-		await expectRevert(token.transferFrom(user, other, TEST_AMOUNT, {from: other}), 'Eleos: TRANSFER_NOT_ALLOWED');
+		await expectRevert(token.transferFrom(user, other, TEST_AMOUNT, {from: other}), 'Amplify: TRANSFER_NOT_ALLOWED');
 	});
 
 	it('permit', async () => {
@@ -197,7 +197,7 @@ contract('EleosERC20', function (accounts) {
 				value: TEST_AMOUNT,
 				deadline: MAX_UINT_256,
 				private_key: otherForEip712PK,
-			}), 'Eleos: INVALID_SIGNATURE'
+			}), 'Amplify: INVALID_SIGNATURE'
 		);
 	});
 });

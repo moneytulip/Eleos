@@ -3,9 +3,9 @@ pragma solidity =0.8.9;
 
 import "./libraries/UQ112x112.sol";
 import "./interfaces/IUniswapV2Pair.sol";
-import "./interfaces/IEleosPriceOracle.sol";
+import "./interfaces/IAmplifyPriceOracle.sol";
 
-contract EleosPriceOracle {
+contract AmplifyPriceOracle {
     using UQ112x112 for uint224;
 
     uint32 public constant MIN_T = 1200;
@@ -32,7 +32,7 @@ contract EleosPriceOracle {
     function toUint224(uint256 input) internal pure returns (uint224) {
         require(
             input <= type(uint224).max,
-            "EleosPriceOracle: UINT224_OVERFLOW"
+            "AmplifyPriceOracle: UINT224_OVERFLOW"
         );
         return uint224(input);
     }
@@ -58,7 +58,7 @@ contract EleosPriceOracle {
         Pair storage pairStorage = getPair[uniswapV2Pair];
         require(
             !pairStorage.initialized,
-            "EleosPriceOracle: ALREADY_INITIALIZED"
+            "AmplifyPriceOracle: ALREADY_INITIALIZED"
         );
 
         uint256 priceCumulativeCurrent = getPriceCumulativeCurrent(
@@ -85,7 +85,7 @@ contract EleosPriceOracle {
         returns (uint224 price, uint32 T)
     {
         Pair memory pair = getPair[uniswapV2Pair];
-        require(pair.initialized, "EleosPriceOracle: NOT_INITIALIZED");
+        require(pair.initialized, "AmplifyPriceOracle: NOT_INITIALIZED");
         Pair storage pairStorage = getPair[uniswapV2Pair];
 
         uint32 blockTimestamp = getBlockTimestamp();
@@ -106,7 +106,7 @@ contract EleosPriceOracle {
             : pair.priceCumulativeSlotA;
 
         T = blockTimestamp - lastUpdateTimestamp; // overflow is desired
-        require(T >= MIN_T, "EleosPriceOracle: NOT_READY"); //reverts only if the pair has just been initialized
+        require(T >= MIN_T, "AmplifyPriceOracle: NOT_READY"); //reverts only if the pair has just been initialized
         // / is safe, and - overflow is desired
         price = toUint224((priceCumulativeCurrent - priceCumulativeLast) / T);
     }
@@ -116,7 +116,7 @@ contract EleosPriceOracle {
         returns (uint224 price, uint32 T)
     {
         Pair memory pair = getPair[uniswapV2Pair];
-        require(pair.initialized, "EleosPriceOracle: NOT_INITIALIZED");
+        require(pair.initialized, "AmplifyPriceOracle: NOT_INITIALIZED");
         Pair storage pairStorage = getPair[uniswapV2Pair];
 
         uint32 blockTimestamp = getBlockTimestamp();
@@ -158,7 +158,7 @@ contract EleosPriceOracle {
         }
 
         T = blockTimestamp - lastUpdateTimestamp; // overflow is desired
-        require(T >= MIN_T, "EleosPriceOracle: NOT_READY"); //reverts only if the pair has just been initialized
+        require(T >= MIN_T, "AmplifyPriceOracle: NOT_READY"); //reverts only if the pair has just been initialized
         // / is safe, and - overflow is desired
         price = toUint224((priceCumulativeCurrent - priceCumulativeLast) / T);
     }

@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const factory = await ethers.getContractFactory("EleosPriceOracle");
+  const factory = await ethers.getContractFactory("AmplifyPriceOracle");
   const contract = await factory.deploy();
 
   console.log(`Contract address: ${contract.address}`);

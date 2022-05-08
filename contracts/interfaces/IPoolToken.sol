@@ -3,7 +3,7 @@
 pragma solidity >=0.8.9;
 
 interface IPoolToken {
-    /*** Eleos ERC20 ***/
+    /*** Amplify ERC20 ***/
 
     function name() external view returns (string memory);
 

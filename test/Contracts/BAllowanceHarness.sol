@@ -6,7 +6,7 @@ import "../../contracts/BAllowance.sol";
 contract BAllowanceHarness is BAllowance {
     constructor(string memory _name, string memory _symbol)
         public
-        EleosERC20()
+        AmplifyERC20()
     {
         _setName(_name, _symbol);
     }

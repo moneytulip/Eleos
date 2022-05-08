@@ -14,7 +14,7 @@ contract Ampl {
     string public constant name = "Ampl";
 
     /// @notice EIP-20 token symbol for this token
-    string public constant symbol = "Ampl";
+    string public constant symbol = "AMPL";
 
     /// @notice EIP-20 token decimals for this token
     uint8 public constant decimals = 18;

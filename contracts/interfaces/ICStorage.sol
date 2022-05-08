@@ -7,7 +7,7 @@ interface ICStorage {
 
     function borrowable1() external view returns (address);
 
-    function eleosPriceOracle() external view returns (address);
+    function amplifyPriceOracle() external view returns (address);
 
     function safetyMarginSqrt() external view returns (uint256);
 

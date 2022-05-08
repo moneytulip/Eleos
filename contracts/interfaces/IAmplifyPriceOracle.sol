@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.9;
 
-interface IEleosPriceOracle {
+interface IAmplifyPriceOracle {
     function MIN_T() external pure returns (uint32);
 
     function getPair(address uniswapV2Pair)
