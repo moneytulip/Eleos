@@ -70,14 +70,15 @@ contract SupplyVaultStrategyV3 is ISupplyVaultStrategy, Ownable {
         _;
     }
 
-    IFactory constant TAROT_FACTORY = IFactory(0xaFc0F83aBF95Fa4d90C10d3d6bb1FB692f5F9B72);
+    // TODO: Set Factory.
+    IFactory constant AMPLIFY_FACTORY = IFactory(0xaFc0F83aBF95Fa4d90C10d3d6bb1FB692f5F9B72);
 
     function getBorrowable(address _address) external view override onlyAuthorized returns (IBorrowable) {
         ISupplyVault supplyVault = ISupplyVault(msg.sender);
         address underlying = address(supplyVault.underlying());
 
         // Treating _address as a UniswapV2Pair, try to get the lending pool from the known factory adress
-        (bool initialized, , , address borrowable0, address borrowable1) = TAROT_FACTORY.getLendingPool(_address);
+        (bool initialized, , , address borrowable0, address borrowable1) = AMPLIFY_FACTORY.getLendingPool(_address);
         if (initialized) {
             if (IBorrowable(borrowable0).underlying() == underlying) {
                 return IBorrowable(borrowable0);
