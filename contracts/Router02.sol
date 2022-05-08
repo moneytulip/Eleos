@@ -17,7 +17,6 @@ import "./libraries/TransferHelper.sol";
 
 import "./Borrowable.sol";
 import "./Collateral.sol";
-// import "hardhat/console.sol";
 
 contract Router02 is IRouter02, IAmplifyCallee {
     using SafeMath for uint256;
@@ -767,8 +766,6 @@ contract Router02 is IRouter02, IAmplifyCallee {
         override
         returns (address collateral)
     {
-        // console.logBytes32(keccak256(abi.encodePacked(type(Collateral).creationCode)));
-
         collateral = address(
             uint160(
                 uint256(

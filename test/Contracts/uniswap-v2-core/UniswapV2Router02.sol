@@ -6,7 +6,6 @@
 pragma solidity =0.8.9;
 
 import "./UniswapV2Pair.sol";
-import "hardhat/console.sol";
 
 interface IUniswapV2Router01 {
     function factory() external view returns (address);
