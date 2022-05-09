@@ -114,39 +114,40 @@ async function main() {
       })
       .then(async (shortfalls) =>
         shortfalls.map(async (shorty: any) => {
-          console.log(shorty);
-          console.log("Approving Borrowable", shorty);
           const underlying = await Erc20Factory.attach(
             shorty.borrowable.underlying.id
           );
-          console.log("Approving transfer for liquidator");
-          // TODO clean this up, remove dumb hardcoded max and approval amt
-          const dumbHardCodedAmt = 1e6;
+          const liquidatorUnderlyingBalance = await underlying.balanceOf(
+            process.env.ADMIN_ADDRESS ?? ""
+          );
+          const shortfall = shorty.shortfall;
+          const liquidationAmount = shortfall.lt(liquidatorUnderlyingBalance)
+            ? shortfall
+            : liquidatorUnderlyingBalance;
           const approve = await underlying.approve(
             router.address,
-            BN.from(dumbHardCodedAmt),
+            liquidationAmount,
             { from: process.env.ADMIN_ADDRESS ?? "" }
           );
-          await approve.wait();
-          console.log("Completed approval", approve);
           console.log(
-            "But do I need to also have a balance?",
-            await underlying.balanceOf(process.env.ADMIN_ADDRESS ?? "")
+            "Initiating approval for liquidator's underlying",
+            approve
           );
-          console.log("Preparing to liquidate", shorty);
+          await approve.wait();
+          console.log("Initiating liquidation", shorty);
           const tx = await router.liquidate(
             shorty.borrowable.id,
-            // TODO: handle token specific decimals on conversion
-            BN.from(dumbHardCodedAmt),
+            BN.from(liquidationAmount),
             shorty.user.id,
             process.env.ADMIN_ADDRESS,
             moment().unix() + SECS_IN_HOUR
           );
           await tx.wait();
-          console.log("Liquidated?", tx);
+          console.log("Completed Liquidated tx:", tx);
           return tx;
         })
-      ).then(async (liquidationRequests) => {
+      )
+      .then(async (liquidationRequests) => {
         const out = [];
         for await (const tx of liquidationRequests) {
           out.push(tx);
