@@ -2,11 +2,7 @@ import { Contract } from "@ethersproject/contracts";
 import { ethers } from "hardhat";
 import fetch from "cross-fetch";
 import { HttpLink } from "apollo-link-http";
-import {
-  ApolloClient,
-  InMemoryCache,
-  gql,
-} from "@apollo/client/core";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client/core";
 import moment from "moment";
 
 const client = new ApolloClient({
@@ -18,8 +14,9 @@ const client = new ApolloClient({
 });
 
 // TODO: paginate through users
-const borrowPositionQuery = `{
-  users(first: 100) {
+const borrowPositionQuery = `
+  query UserPage($offset: Int, $limit: Int) {
+    users(skip: $offset, first: $limit) {
     id
     borrowPositions(where: {borrowBalance_gt: 0.0}) {
       id
@@ -67,60 +64,96 @@ async function main() {
   // Call C.accountLiquidity(user) to get shortfall s
   // If s > 0, then we can liquidate
 
+  const PAGE_SIZE = 25;
+  const processPage = async (pageNumber: number) => {
+    console.log(`Processing page ${pageNumber}`);
+    const offset = pageNumber * PAGE_SIZE;
+    return await client
+      .query({
+        query: gql(borrowPositionQuery),
+        variables: {
+          limit: 25,
+          offset,
+        },
+      })
+      .then((response) => {
+        if (response.data.users.length === 0) {
+          throw new Error("EXHAUSTED_PAGES");
+        }
+        return response.data.users.filter((user: any) => {
+          return user.borrowPositions.length;
+        });
+      })
+      .then((users) =>
+        users.map((user: any) =>
+          user.borrowPositions.map(async (position: any) => {
+            const collateralAddr =
+              position.borrowable.lendingPool.collateral.id;
+            const collateral = await CollateralFactory.attach(collateralAddr);
+            // const tx = await collateral.accountLiquidity(user.id);
+            // await tx.wait();
+            // console.log('Processed liquidity calc tx');
+            const { liquidity, shortfall } =
+              await collateral.callStatic.accountLiquidity(user.id);
+            return { ...position, liquidity, shortfall, user: user };
+          })
+        )
+      )
+      .then((queriesPerUser) => queriesPerUser.flat())
+      .then(async (queries) =>
+        queries.map(async (query: any) => {
+          console.log("Preparing to query for shortfall");
+          const shorty = await query;
+          if (BN.from(shorty.shortfall).gt(0)) {
+            console.log("Approving Borrowable", shorty);
+            const underlying = await Erc20Factory.attach(
+              shorty.borrowable.underlying.id
+            );
+            console.log("Approving transfer for liquidator");
+            // TODO clean this up, remove dumb hardcoded max and approval amt
+            const dumbHardCodedAmt = 1e6;
+            const approve = await underlying.approve(
+              router.address,
+              BN.from(dumbHardCodedAmt),
+              { from: process.env.ADMIN_ADDRESS ?? "" }
+            );
+            // await approve.wait();
+            console.log("Completed approval", approve);
+            console.log(
+              "But do I need to also have a balance?",
+              await underlying.balanceOf(process.env.ADMIN_ADDRESS ?? "")
+            );
+            console.log("Preparing to liquidate", shorty);
+            const tx = await router.liquidate(
+              shorty.borrowable.id,
+              // TODO: handle token specific decimals on conversion
+              BN.from(dumbHardCodedAmt),
+              shorty.user.id,
+              process.env.ADMIN_ADDRESS,
+              moment().unix() + SECS_IN_HOUR
+            );
+            await tx.wait();
+            console.log("Liquidated?", tx);
+            return tx;
+          }
+          return null;
+        })
+      );
+  };
+
+  let pagesExhausted = false;
+  let page = 0;
+  while (!pagesExhausted) {
+    await processPage(page).catch(err => {
+      if (err.message === "EXHAUSTED_PAGES") {
+        pagesExhausted = true;
+      }
+    });
+    page++;
+  }
+
   // Note: We run sequential otherwise the nonce gets fucked up
   // on the provider.
-  const querySets = await client
-    .query({
-      query: gql(borrowPositionQuery),
-    })
-    .then((response) =>
-      response.data.users.filter((user: any) => {
-        return user.borrowPositions.length;
-      })
-    )
-    .then((users) =>
-      users.map((user: any) =>
-        user.borrowPositions.map(async (position: any) => {
-          const collateralAddr = position.borrowable.lendingPool.collateral.id;
-          const collateral = await CollateralFactory.attach(collateralAddr);
-          // const tx = await collateral.accountLiquidity(user.id);
-          // await tx.wait();
-          // console.log('Processed liquidity calc tx');
-          const { liquidity, shortfall } =
-            await collateral.callStatic.accountLiquidity(user.id);
-          return { ...position, liquidity, shortfall, user: user };
-        })
-      )
-    );
-
-  for (const queries of querySets) {
-    for (const query of queries) {
-      console.log("Preparing to query for shortfall");
-      const shorty = await query;
-      if (BN.from(shorty.shortfall).gt(0)) {
-        console.log("Approving Borrowable", shorty);
-        const underlying = await Erc20Factory.attach(shorty.borrowable.underlying.id);
-        console.log('Approving transfer for liquidator');
-        // TODO clean this up, remove dumb hardcoded max and approval amt
-        const dumbHardCodedAmt = 1E6;
-        const approve = await underlying.approve(router.address, BN.from(dumbHardCodedAmt), {from: process.env.ADMIN_ADDRESS ?? ''});
-        await approve.wait();
-        console.log('Completed approval', approve);
-        console.log('But do I need to also have a balance?', await underlying.balanceOf(process.env.ADMIN_ADDRESS ?? ''))
-        console.log("Preparing to liquidate", shorty);
-        const tx = await router.liquidate(
-          shorty.borrowable.id,
-          // TODO: handle token specific decimals on conversion
-          BN.from(dumbHardCodedAmt),
-          shorty.user.id,
-          process.env.ADMIN_ADDRESS,
-          moment().unix() + SECS_IN_HOUR,
-        );
-        await tx.wait();
-        console.log('Liquidated?', tx);
-      }
-    }
-  }
 
   // test
   // const collateral = await CollateralFactory.attach('0x10604cc77bc4fe3ef8e3220a8656c6903e7b6d1b');
