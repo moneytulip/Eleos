@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT-License
 pragma solidity =0.8.9;
 
-import "../../contracts/EleosERC20.sol";
+import "../../contracts/AmplifyERC20.sol";
 
-contract EleosERC20Harness is EleosERC20 {
+contract AmplifyERC20Harness is AmplifyERC20 {
     constructor(string memory _name, string memory _symbol)
         public
-        EleosERC20()
+        AmplifyERC20()
     {
         _setName(_name, _symbol);
     }

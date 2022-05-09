@@ -1,6 +1,6 @@
 import { Contract } from "@ethersproject/contracts";
 import { ethers } from "hardhat";
-const { makeUniswapV2Pair } = require("../test/Utils/Eleos");
+const { makeUniswapV2Pair } = require("../test/Utils/Amplify");
 const BN = ethers.BigNumber;
 
 const { keccak256 } = require("ethers").utils;

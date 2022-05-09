@@ -1,6 +1,6 @@
 const {
 	BInterestRateModel,
-} = require('./Utils/Eleos');
+} = require('./Utils/Amplify');
 const {
 	expectAlmostEqualMantissa,
 	expectEvent,

@@ -1,12 +1,12 @@
 const {
 	Borrowable,
 	Collateral,
-	EleosCallee,
+	AmplifyCallee,
 	ReentrantCallee,
 	Recipient,
 	makeFactory,
 	makeUniswapV2Pair,
-} = require('./Utils/Eleos');
+} = require('./Utils/Amplify');
 const {
 	expectAlmostEqualMantissa,
 	expectRevert,
@@ -58,7 +58,7 @@ contract('Collateral', function (accounts) {
 		before(async () => {
 			collateral = await Collateral.new();
 			underlying = await makeUniswapV2Pair();
-			await collateral.setPriceOracle(factory.obj.eleosPriceOracle.address);
+			await collateral.setPriceOracle(factory.obj.amplifyPriceOracle.address);
 			await collateral.setUnderlyingHarness(underlying.address);
 		});
 		
@@ -76,7 +76,7 @@ contract('Collateral', function (accounts) {
 				const adjustedReserve1 = currentReserve1 * adjustement;
 				expectAlmostEqualMantissa(bnMantissa(adjustedReserve1 / adjustedReserve0), bnMantissa(priceOracle));
 				
-				await factory.obj.eleosPriceOracle.setPrice(underlying.address, uq112(priceOracle));
+				await factory.obj.amplifyPriceOracle.setPrice(underlying.address, uq112(priceOracle));
 				await underlying.setTotalSupply(bnMantissa(totalSupply));
 				await underlying.setReserves(bnMantissa(currentReserve0), bnMantissa(currentReserve1));
 				const {price0, price1} = await collateral.getPrices.call();
@@ -91,28 +91,28 @@ contract('Collateral', function (accounts) {
 			reserve0 = "1";
 			reserve1 = "200000000000000000000000000000000";
 			totalSupply = "14142000000000000";
-			await factory.obj.eleosPriceOracle.setPrice(underlying.address, priceUQ112);
+			await factory.obj.amplifyPriceOracle.setPrice(underlying.address, priceUQ112);
 			await underlying.setTotalSupply(totalSupply);
 			await underlying.setReserves(reserve0, reserve1);
-			await expectRevert(collateral.getPrices(), 'Eleos: PRICE_CALCULATION_ERROR');
+			await expectRevert(collateral.getPrices(), 'Amplify: PRICE_CALCULATION_ERROR');
 			
 			priceUQ112 = "26"; //0.5e-32
 			reserve0 = "200000000000000000000000000000000";
 			reserve1 = "1";
 			totalSupply = "14142000000000000";
-			await factory.obj.eleosPriceOracle.setPrice(underlying.address, priceUQ112);
+			await factory.obj.amplifyPriceOracle.setPrice(underlying.address, priceUQ112);
 			await underlying.setTotalSupply(totalSupply);
 			await underlying.setReserves(reserve0, reserve1);
-			await expectRevert(collateral.getPrices(), 'Eleos: PRICE_CALCULATION_ERROR');
+			await expectRevert(collateral.getPrices(), 'Amplify: PRICE_CALCULATION_ERROR');
 			
 			priceUQ112 = uq112(1); //1
 			reserve0 = "14142000000000000";
 			reserve1 = "14142000000000000";
 			totalSupply = "1";
-			await factory.obj.eleosPriceOracle.setPrice(underlying.address, priceUQ112);
+			await factory.obj.amplifyPriceOracle.setPrice(underlying.address, priceUQ112);
 			await underlying.setTotalSupply(totalSupply);
 			await underlying.setReserves(reserve0, reserve1);
-			await expectRevert(collateral.getPrices(), 'Eleos: PRICE_CALCULATION_ERROR');			
+			await expectRevert(collateral.getPrices(), 'Amplify: PRICE_CALCULATION_ERROR');			
 		});
 	});
 	
@@ -193,7 +193,7 @@ contract('Collateral', function (accounts) {
 			it(`transfer:fail`, async () => {
 				const transferAmount = slightlyIncrease(bnMantissa(expectedLiquidity / exchangeRate + 0.0000001));
 				expect(await collateral.tokensUnlocked.call(user, transferAmount)).to.eq(false);
-				await expectRevert(collateral.transfer(address(0), transferAmount, {from: user}), 'Eleos: INSUFFICIENT_LIQUIDITY');
+				await expectRevert(collateral.transfer(address(0), transferAmount, {from: user}), 'Amplify: INSUFFICIENT_LIQUIDITY');
 			});
 
 			it(`accountLiquidity`, async () => {
@@ -261,18 +261,18 @@ contract('Collateral', function (accounts) {
 		});
 		
 		it(`fail if msg.sender is not borrowable`, async () => {
-			await expectRevert(collateral.seize(address(0), address(0), '0'), "Eleos: UNAUTHORIZED");
+			await expectRevert(collateral.seize(address(0), address(0), '0'), "Amplify: UNAUTHORIZED");
 		});
 		
 		it(`fail if shortfall is insufficient`, async () => {
 			await collateral.setAccountLiquidityHarness(borrower, '0', '0');
 			await expectRevert(
 				borrowable0.seizeHarness(collateral.address, liquidator, borrower, '0'), 
-				"Eleos: INSUFFICIENT_SHORTFALL"
+				"Amplify: INSUFFICIENT_SHORTFALL"
 			);
 			await expectRevert(
 				borrowable1.seizeHarness(collateral.address, liquidator, borrower, '0'), 
-				"Eleos: INSUFFICIENT_SHORTFALL"
+				"Amplify: INSUFFICIENT_SHORTFALL"
 			);
 		});
 		
@@ -281,11 +281,11 @@ contract('Collateral', function (accounts) {
 			await collateral.setBalanceHarness(borrower, bnMantissa(collateralTokens));
 			await expectRevert(
 				borrowable0.seizeHarness(collateral.address, liquidator, borrower, slightlyIncrease(bnMantissa(maxRepay0))), 
-				"Eleos: LIQUIDATING_TOO_MUCH"
+				"Amplify: LIQUIDATING_TOO_MUCH"
 			);
 			await expectRevert(
 				borrowable1.seizeHarness(collateral.address, liquidator, borrower, slightlyIncrease(bnMantissa(maxRepay1))), 
-				"Eleos: LIQUIDATING_TOO_MUCH"
+				"Amplify: LIQUIDATING_TOO_MUCH"
 			);
 		});
 		
@@ -335,7 +335,7 @@ contract('Collateral', function (accounts) {
 			await collateral.setUnderlyingHarness(underlying.address);
 			await collateral.unlockTokensTransfer();
 			recipient = await Recipient.new();
-			callee = (await EleosCallee.new(recipient.address, collateral.address)).address;
+			callee = (await AmplifyCallee.new(recipient.address, collateral.address)).address;
 		});
 		
 		beforeEach(async () => {
@@ -383,7 +383,7 @@ contract('Collateral', function (accounts) {
 		
 		it('redeem fails if redeemTokens is not enough', async () => {
 			await collateral.transfer(collateral.address, redeemTokens.sub(new BN(1)), {from: user});
-			await expectRevert(collateral.flashRedeem(user, redeemAmount, '0x'), 'Eleos: INSUFFICIENT_REDEEM_TOKENS');
+			await expectRevert(collateral.flashRedeem(user, redeemAmount, '0x'), 'Amplify: INSUFFICIENT_REDEEM_TOKENS');
 		});
 		
 		it('redeemTokens can be more than needed', async () => {
@@ -420,7 +420,7 @@ contract('Collateral', function (accounts) {
 		it('redeem fails if redeemAmount exceeds cash', async () => {
 			await expectRevert(
 				collateral.flashRedeem(user, collateralBalancePrior.add(new BN(1)), '0x'), 
-				'Eleos: INSUFFICIENT_CASH'
+				'Amplify: INSUFFICIENT_CASH'
 			);
 		});
 		
@@ -449,11 +449,11 @@ contract('Collateral', function (accounts) {
 		});
 		
 		it(`borrow reentrancy`, async () => {
-			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [1])), 'Eleos: REENTERED');
-			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [2])), 'Eleos: REENTERED');
-			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [3])), 'Eleos: REENTERED');
-			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [4])), 'Eleos: REENTERED');
-			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [5])), 'Eleos: REENTERED');
+			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [1])), 'Amplify: REENTERED');
+			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [2])), 'Amplify: REENTERED');
+			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [3])), 'Amplify: REENTERED');
+			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [4])), 'Amplify: REENTERED');
+			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [5])), 'Amplify: REENTERED');
 			await expectRevert(collateral.flashRedeem(receiver, '0', encode(['uint'], [0])), 'TEST');
 		});
 	});

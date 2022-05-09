@@ -24,7 +24,7 @@ const MockOracle = artifacts.require('MockOracle');
 const BDeployer = artifacts.require('BDeployer');
 const CDeployer = artifacts.require('CDeployer');
 const Factory = artifacts.require('Factory');
-const EleosERC20 = artifacts.require('EleosERC20Harness');
+const AmplifyERC20 = artifacts.require('AmplifyERC20Harness');
 const PoolToken = artifacts.require('PoolTokenHarness');
 const CollateralProduction = artifacts.require('Collateral');
 const BorrowableProduction = artifacts.require('Borrowable');
@@ -32,7 +32,7 @@ const Collateral = artifacts.require('CollateralHarness');
 const Borrowable = artifacts.require('BorrowableHarness');
 const BAllowance = artifacts.require('BAllowanceHarness');
 const BInterestRateModel = artifacts.require('BInterestRateModelHarness');
-const EleosCallee = artifacts.require('EleosCallee');
+const AmplifyCallee = artifacts.require('AmplifyCallee');
 const ReentrantCallee = artifacts.require('ReentrantCallee');
 const Recipient = artifacts.require('Recipient');
 const MockBorrowTracker = artifacts.require('MockBorrowTracker');
@@ -44,7 +44,7 @@ async function makeErc20Token(opts = {}) {
 	const decimals = etherUnsigned(dfn(opts.decimals, 18));
 	const symbol = opts.symbol || 'DAI';
 	const name = opts.name || `Erc20 ${symbol}`;
-	return await EleosERC20.new(name, symbol);
+	return await AmplifyERC20.new(name, symbol);
 }
 
 async function makeUniswapV2Factory(opts = {}) {
@@ -65,7 +65,7 @@ async function makeUniswapV2Pair(opts = {}) {
 	}
 }
 
-async function makeEleosPriceOracle(opts = {}) {
+async function makeAmplifyPriceOracle(opts = {}) {
 	return await MockOracle.new();
 }
 
@@ -85,9 +85,9 @@ async function makeFactory(opts = {}) {
 	const bDeployer = opts.bDeployer || await makeBDeployer(opts);
 	const cDeployer = opts.cDeployer || await makeCDeployer(opts);
 	const uniswapV2Factory = opts.uniswapV2Factory || await makeUniswapV2Factory(opts);
-	const eleosPriceOracle = opts.eleosPriceOracle || await makeEleosPriceOracle(opts);
-	const factory = await Factory.new(admin, reservesAdmin, bDeployer.address, cDeployer.address, eleosPriceOracle.address);
-	return Object.assign(factory, {obj: {admin, reservesAdmin, bDeployer, cDeployer, uniswapV2Factory, eleosPriceOracle,
+	const amplifyPriceOracle = opts.amplifyPriceOracle || await makeAmplifyPriceOracle(opts);
+	const factory = await Factory.new(admin, reservesAdmin, bDeployer.address, cDeployer.address, amplifyPriceOracle.address);
+	return Object.assign(factory, {obj: {admin, reservesAdmin, bDeployer, cDeployer, uniswapV2Factory, amplifyPriceOracle,
 		checkLendingPool: async (pair, {initialized, lendingPoolId, collateral, borrowable0, borrowable1}) => {
 			const lendingPool = await factory.getLendingPool(pair.address);
 			if(initialized) expect(lendingPool.initialized).to.eq(initialized);
@@ -228,7 +228,7 @@ module.exports = {
 	BDeployer,
 	CDeployer,
 	Factory,
-	EleosERC20,
+	AmplifyERC20,
 	PoolToken,
 	CollateralProduction,
 	BorrowableProduction,
@@ -236,7 +236,7 @@ module.exports = {
 	Borrowable,
 	BAllowance,
 	BInterestRateModel,
-	EleosCallee,
+	AmplifyCallee,
 	ReentrantCallee,
 	Recipient,
 	MockBorrowTracker,
@@ -244,7 +244,7 @@ module.exports = {
 	makeErc20Token,
 	makeUniswapV2Factory,
 	makeUniswapV2Pair,
-	makeEleosPriceOracle,
+	makeAmplifyPriceOracle,
 	makeBDeployer,
 	makeCDeployer,
 	makeFactory,

@@ -7,11 +7,11 @@ const {
 	makeErc20Token,
 	makeUniswapV2Factory,
 	makeUniswapV2Pair,
-	makeEleosPriceOracle,
+	makeAmplifyPriceOracle,
 	makeBDeployer,
 	makeCDeployer,
 	makeFactory
-} = require('./Utils/Eleos');
+} = require('./Utils/Amplify');
 const {
 	expectEqual,
 	expectAlmostEqualMantissa,
@@ -64,8 +64,8 @@ contract('Factory', function (accounts) {
 			const bDeployer = address(1);
 			const cDeployer = address(2);
 			const uniswapV2Factory = address(3);
-			const eleosPriceOracle = address(4);
-			const factory = await Factory.new(admin, reservesAdmin, bDeployer, cDeployer, eleosPriceOracle);
+			const amplifyPriceOracle = address(4);
+			const factory = await Factory.new(admin, reservesAdmin, bDeployer, cDeployer, amplifyPriceOracle);
 			expect(await factory.admin()).to.eq(admin);
 			expect(await factory.pendingAdmin()).to.eq(address(0));
 			expect(await factory.reservesAdmin()).to.eq(reservesAdmin);
@@ -74,7 +74,7 @@ contract('Factory', function (accounts) {
 			expectEqual(await factory.allLendingPoolsLength(), 0);
 			expect(await factory.bDeployer()).to.eq(bDeployer);
 			expect(await factory.cDeployer()).to.eq(cDeployer);
-			expect(await factory.eleosPriceOracle()).to.eq(eleosPriceOracle);
+			expect(await factory.amplifyPriceOracle()).to.eq(amplifyPriceOracle);
 		});		
 	});
 	
@@ -124,9 +124,9 @@ contract('Factory', function (accounts) {
 			);
 		});
 		it('revert if already exists', async () => {
-			await expectRevert(factory.createCollateral(uniswapV2Pair1.address), "Eleos: ALREADY_EXISTS");
-			await expectRevert(factory.createBorrowable0(uniswapV2Pair2.address), "Eleos: ALREADY_EXISTS");
-			await expectRevert(factory.createBorrowable1(uniswapV2Pair3.address), "Eleos: ALREADY_EXISTS");			
+			await expectRevert(factory.createCollateral(uniswapV2Pair1.address), "Amplify: ALREADY_EXISTS");
+			await expectRevert(factory.createBorrowable0(uniswapV2Pair2.address), "Amplify: ALREADY_EXISTS");
+			await expectRevert(factory.createBorrowable1(uniswapV2Pair3.address), "Amplify: ALREADY_EXISTS");			
 		});
 		it('second contract deploy reuse lendingPool', async () => {
 			borrowable01 = await factory.createBorrowable0.call(uniswapV2Pair1.address);
@@ -140,9 +140,9 @@ contract('Factory', function (accounts) {
 			await factory.obj.checkLendingPool(uniswapV2Pair3, {lendingPoolId: 3, collateral: collateral3});
 		}); 
 		it('initialize revert if not all three contracts are deployed', async () => {
-			await expectRevert(factory.initializeLendingPool(uniswapV2Pair1.address), "Eleos: BORROWABLE1_NOT_CREATED");
-			await expectRevert(factory.initializeLendingPool(uniswapV2Pair2.address), "Eleos: COLLATERALIZABLE_NOT_CREATED");
-			await expectRevert(factory.initializeLendingPool(uniswapV2Pair3.address), "Eleos: BORROWABLE0_NOT_CREATED");
+			await expectRevert(factory.initializeLendingPool(uniswapV2Pair1.address), "Amplify: BORROWABLE1_NOT_CREATED");
+			await expectRevert(factory.initializeLendingPool(uniswapV2Pair2.address), "Amplify: COLLATERALIZABLE_NOT_CREATED");
+			await expectRevert(factory.initializeLendingPool(uniswapV2Pair3.address), "Amplify: BORROWABLE0_NOT_CREATED");
 		}); 
 		it('third contract deploy reuse lendingPool', async () => {
 			borrowable11 = await factory.createBorrowable1.call(uniswapV2Pair1.address);
@@ -159,30 +159,30 @@ contract('Factory', function (accounts) {
 			const lendingPool = await factory.getLendingPool(uniswapV2Pair1.address);
 			await expectRevert((await Collateral.at(lendingPool.collateral))._initialize(
 				"", "", address(0), address(0), address(0)
-			), "Eleos: UNAUTHORIZED");
+			), "Amplify: UNAUTHORIZED");
 			await expectRevert((await Borrowable.at(lendingPool.borrowable0))._initialize(
 				"", "", address(0), address(0)
-			), "Eleos: UNAUTHORIZED");
+			), "Amplify: UNAUTHORIZED");
 			await expectRevert((await Borrowable.at(lendingPool.borrowable1))._initialize(
 				"", "", address(0), address(0)
-			), "Eleos: UNAUTHORIZED");
+			), "Amplify: UNAUTHORIZED");
 		}); 
 		it('factory can only be set once', async () => {
 			const lendingPool = await factory.getLendingPool(uniswapV2Pair1.address);
-			await expectRevert((await Collateral.at(lendingPool.collateral))._setFactory(), "Eleos: FACTORY_ALREADY_SET");
-			await expectRevert((await Borrowable.at(lendingPool.borrowable0))._setFactory(), "Eleos: FACTORY_ALREADY_SET");
-			await expectRevert((await Borrowable.at(lendingPool.borrowable1))._setFactory(), "Eleos: FACTORY_ALREADY_SET");
+			await expectRevert((await Collateral.at(lendingPool.collateral))._setFactory(), "Amplify: FACTORY_ALREADY_SET");
+			await expectRevert((await Borrowable.at(lendingPool.borrowable0))._setFactory(), "Amplify: FACTORY_ALREADY_SET");
+			await expectRevert((await Borrowable.at(lendingPool.borrowable1))._setFactory(), "Amplify: FACTORY_ALREADY_SET");
 		}); 
 		it('initially is not initialized', async () => {
 			await factory.obj.checkLendingPool(uniswapV2Pair1, {initialized: false});
 			await factory.obj.checkLendingPool(uniswapV2Pair2, {initialized: false});
 			await factory.obj.checkLendingPool(uniswapV2Pair3, {initialized: false});
 		});
-		it('eleosPriceOracle can be initialized or not', async () => {
-			expect( (await factory.obj.eleosPriceOracle.getPair(uniswapV2Pair1.address)).initialized ).to.eq(false);
-			expect( (await factory.obj.eleosPriceOracle.getPair(uniswapV2Pair2.address)).initialized ).to.eq(false);
-			await factory.obj.eleosPriceOracle.initialize(uniswapV2Pair3.address);
-			expect( (await factory.obj.eleosPriceOracle.getPair(uniswapV2Pair3.address)).initialized ).to.eq(true);
+		it('amplifyPriceOracle can be initialized or not', async () => {
+			expect( (await factory.obj.amplifyPriceOracle.getPair(uniswapV2Pair1.address)).initialized ).to.eq(false);
+			expect( (await factory.obj.amplifyPriceOracle.getPair(uniswapV2Pair2.address)).initialized ).to.eq(false);
+			await factory.obj.amplifyPriceOracle.initialize(uniswapV2Pair3.address);
+			expect( (await factory.obj.amplifyPriceOracle.getPair(uniswapV2Pair3.address)).initialized ).to.eq(true);
 		});
 		it('initialize', async () => {
 			const receipt1 = await factory.initializeLendingPool(uniswapV2Pair1.address);
@@ -217,15 +217,15 @@ contract('Factory', function (accounts) {
 			expect(await borrowable1.underlying()).to.eq(uniswapV2Pair1.obj.token1.address);
 			expect(await borrowable1.collateral()).to.eq(collateral1);
 		});
-		it('eleosPriceOracle is initialized correctly', async () => {
-			expect( (await factory.obj.eleosPriceOracle.getPair(uniswapV2Pair1.address)).initialized ).to.eq(true);
-			expect( (await factory.obj.eleosPriceOracle.getPair(uniswapV2Pair2.address)).initialized ).to.eq(true);
-			expect( (await factory.obj.eleosPriceOracle.getPair(uniswapV2Pair3.address)).initialized ).to.eq(true);
+		it('amplifyPriceOracle is initialized correctly', async () => {
+			expect( (await factory.obj.amplifyPriceOracle.getPair(uniswapV2Pair1.address)).initialized ).to.eq(true);
+			expect( (await factory.obj.amplifyPriceOracle.getPair(uniswapV2Pair2.address)).initialized ).to.eq(true);
+			expect( (await factory.obj.amplifyPriceOracle.getPair(uniswapV2Pair3.address)).initialized ).to.eq(true);
 		});
 		it('revert if already initialized', async () => {
-			await expectRevert(factory.initializeLendingPool(uniswapV2Pair1.address), "Eleos: ALREADY_INITIALIZED");
-			await expectRevert(factory.initializeLendingPool(uniswapV2Pair2.address), "Eleos: ALREADY_INITIALIZED");
-			await expectRevert(factory.initializeLendingPool(uniswapV2Pair3.address), "Eleos: ALREADY_INITIALIZED");
+			await expectRevert(factory.initializeLendingPool(uniswapV2Pair1.address), "Amplify: ALREADY_INITIALIZED");
+			await expectRevert(factory.initializeLendingPool(uniswapV2Pair2.address), "Amplify: ALREADY_INITIALIZED");
+			await expectRevert(factory.initializeLendingPool(uniswapV2Pair3.address), "Amplify: ALREADY_INITIALIZED");
 		});
 	});
 	
@@ -235,9 +235,9 @@ contract('Factory', function (accounts) {
 			factory = await makeFactory({admin, reservesAdmin});
 		});
 		it("change admin", async () => {
-			await expectRevert(factory._setPendingAdmin(root, {from: root}), "Eleos: UNAUTHORIZED");
-			await expectRevert(factory._setPendingAdmin(root, {from: reservesAdmin}), "Eleos: UNAUTHORIZED");
-			await expectRevert(factory._acceptAdmin({from: root}), "Eleos: UNAUTHORIZED");
+			await expectRevert(factory._setPendingAdmin(root, {from: root}), "Amplify: UNAUTHORIZED");
+			await expectRevert(factory._setPendingAdmin(root, {from: reservesAdmin}), "Amplify: UNAUTHORIZED");
+			await expectRevert(factory._acceptAdmin({from: root}), "Amplify: UNAUTHORIZED");
 			expectEvent(await factory._setPendingAdmin(root, {from: admin}), "NewPendingAdmin", {
 				'oldPendingAdmin': address(0),
 				'newPendingAdmin': root,
@@ -257,9 +257,9 @@ contract('Factory', function (accounts) {
 			expect(await factory.pendingAdmin()).to.eq(address(0));
 		});
 		it("change reserves admin", async () => {
-			await expectRevert(factory._setReservesPendingAdmin(root, {from: root}), "Eleos: UNAUTHORIZED");
-			await expectRevert(factory._setReservesPendingAdmin(root, {from: admin}), "Eleos: UNAUTHORIZED");
-			await expectRevert(factory._acceptReservesAdmin({from: root}), "Eleos: UNAUTHORIZED");
+			await expectRevert(factory._setReservesPendingAdmin(root, {from: root}), "Amplify: UNAUTHORIZED");
+			await expectRevert(factory._setReservesPendingAdmin(root, {from: admin}), "Amplify: UNAUTHORIZED");
+			await expectRevert(factory._acceptReservesAdmin({from: root}), "Amplify: UNAUTHORIZED");
 			expectEvent(await factory._setReservesPendingAdmin(root, {from: reservesAdmin}), "NewReservesPendingAdmin", {
 				'oldReservesPendingAdmin': address(0),
 				'newReservesPendingAdmin': root,
@@ -279,8 +279,8 @@ contract('Factory', function (accounts) {
 			expect(await factory.reservesPendingAdmin()).to.eq(address(0));
 		});
 		it("change reserves manager", async () => {
-			await expectRevert(factory._setReservesManager(reservesManager, {from: reservesManager}), "Eleos: UNAUTHORIZED");
-			await expectRevert(factory._setReservesManager(reservesManager, {from: admin}), "Eleos: UNAUTHORIZED");
+			await expectRevert(factory._setReservesManager(reservesManager, {from: reservesManager}), "Amplify: UNAUTHORIZED");
+			await expectRevert(factory._setReservesManager(reservesManager, {from: admin}), "Amplify: UNAUTHORIZED");
 			expectEvent(await factory._setReservesManager(reservesManager, {from: reservesAdmin}), "NewReservesManager", {
 				'oldReservesManager': address(0),
 				'newReservesManager': reservesManager,

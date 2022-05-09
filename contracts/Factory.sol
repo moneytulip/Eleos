@@ -9,7 +9,7 @@ import "./interfaces/ICDeployer.sol";
 import "./interfaces/ICollateral.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IUniswapV2Pair.sol";
-import "./interfaces/IEleosPriceOracle.sol";
+import "./interfaces/IAmplifyPriceOracle.sol";
 
 contract Factory is IFactory {
     address public override admin;
@@ -34,20 +34,20 @@ contract Factory is IFactory {
 
     IBDeployer public override bDeployer;
     ICDeployer public override cDeployer;
-    IEleosPriceOracle public override eleosPriceOracle;
+    IAmplifyPriceOracle public override amplifyPriceOracle;
 
     constructor(
         address _admin,
         address _reservesAdmin,
         IBDeployer _bDeployer,
         ICDeployer _cDeployer,
-        IEleosPriceOracle _eleosPriceOracle
+        IAmplifyPriceOracle _amplifyPriceOracle
     ) {
         admin = _admin;
         reservesAdmin = _reservesAdmin;
         bDeployer = _bDeployer;
         cDeployer = _cDeployer;
-        eleosPriceOracle = _eleosPriceOracle;
+        amplifyPriceOracle = _amplifyPriceOracle;
         emit NewAdmin(address(0), _admin);
         emit NewReservesAdmin(address(0), _reservesAdmin);
     }
@@ -81,7 +81,7 @@ contract Factory is IFactory {
         _getTokens(uniswapV2Pair);
         require(
             getLendingPool[uniswapV2Pair].collateral == address(0),
-            "Eleos: ALREADY_EXISTS"
+            "Amplify: ALREADY_EXISTS"
         );
         collateral = cDeployer.deployCollateral(uniswapV2Pair);
         ICollateral(collateral)._setFactory();
@@ -97,7 +97,7 @@ contract Factory is IFactory {
         _getTokens(uniswapV2Pair);
         require(
             getLendingPool[uniswapV2Pair].borrowable0 == address(0),
-            "Eleos: ALREADY_EXISTS"
+            "Amplify: ALREADY_EXISTS"
         );
         borrowable0 = bDeployer.deployBorrowable(uniswapV2Pair, 0);
         IBorrowable(borrowable0)._setFactory();
@@ -113,7 +113,7 @@ contract Factory is IFactory {
         _getTokens(uniswapV2Pair);
         require(
             getLendingPool[uniswapV2Pair].borrowable1 == address(0),
-            "Eleos: ALREADY_EXISTS"
+            "Amplify: ALREADY_EXISTS"
         );
         borrowable1 = bDeployer.deployBorrowable(uniswapV2Pair, 1);
         IBorrowable(borrowable1)._setFactory();
@@ -124,41 +124,41 @@ contract Factory is IFactory {
     function initializeLendingPool(address uniswapV2Pair) external override {
         (address token0, address token1) = _getTokens(uniswapV2Pair);
         LendingPool memory lPool = getLendingPool[uniswapV2Pair];
-        require(!lPool.initialized, "Eleos: ALREADY_INITIALIZED");
+        require(!lPool.initialized, "Amplify: ALREADY_INITIALIZED");
 
         require(
             lPool.collateral != address(0),
-            "Eleos: COLLATERALIZABLE_NOT_CREATED"
+            "Amplify: COLLATERALIZABLE_NOT_CREATED"
         );
         require(
             lPool.borrowable0 != address(0),
-            "Eleos: BORROWABLE0_NOT_CREATED"
+            "Amplify: BORROWABLE0_NOT_CREATED"
         );
         require(
             lPool.borrowable1 != address(0),
-            "Eleos: BORROWABLE1_NOT_CREATED"
+            "Amplify: BORROWABLE1_NOT_CREATED"
         );
 
-        (, , , , , bool oracleInitialized) = eleosPriceOracle.getPair(
+        (, , , , , bool oracleInitialized) = amplifyPriceOracle.getPair(
             uniswapV2Pair
         );
-        if (!oracleInitialized) eleosPriceOracle.initialize(uniswapV2Pair);
+        if (!oracleInitialized) amplifyPriceOracle.initialize(uniswapV2Pair);
 
         ICollateral(lPool.collateral)._initialize(
-            "Eleos Collateral",
+            "Amplify Collateral",
             "cELEOS",
             uniswapV2Pair,
             lPool.borrowable0,
             lPool.borrowable1
         );
         IBorrowable(lPool.borrowable0)._initialize(
-            "Eleos Borrowable",
+            "Amplify Borrowable",
             "bELEOS",
             token0,
             lPool.collateral
         );
         IBorrowable(lPool.borrowable1)._initialize(
-            "Eleos Borrowable",
+            "Amplify Borrowable",
             "bELEOS",
             token1,
             lPool.collateral
@@ -177,14 +177,14 @@ contract Factory is IFactory {
     }
 
     function _setPendingAdmin(address newPendingAdmin) external override {
-        require(msg.sender == admin, "Eleos: UNAUTHORIZED");
+        require(msg.sender == admin, "Amplify: UNAUTHORIZED");
         address oldPendingAdmin = pendingAdmin;
         pendingAdmin = newPendingAdmin;
         emit NewPendingAdmin(oldPendingAdmin, newPendingAdmin);
     }
 
     function _acceptAdmin() external override {
-        require(msg.sender == pendingAdmin, "Eleos: UNAUTHORIZED");
+        require(msg.sender == pendingAdmin, "Amplify: UNAUTHORIZED");
         address oldAdmin = admin;
         address oldPendingAdmin = pendingAdmin;
         admin = pendingAdmin;
@@ -197,7 +197,7 @@ contract Factory is IFactory {
         external
         override
     {
-        require(msg.sender == reservesAdmin, "Eleos: UNAUTHORIZED");
+        require(msg.sender == reservesAdmin, "Amplify: UNAUTHORIZED");
         address oldReservesPendingAdmin = reservesPendingAdmin;
         reservesPendingAdmin = newReservesPendingAdmin;
         emit NewReservesPendingAdmin(
@@ -207,7 +207,7 @@ contract Factory is IFactory {
     }
 
     function _acceptReservesAdmin() external override {
-        require(msg.sender == reservesPendingAdmin, "Eleos: UNAUTHORIZED");
+        require(msg.sender == reservesPendingAdmin, "Amplify: UNAUTHORIZED");
         address oldReservesAdmin = reservesAdmin;
         address oldReservesPendingAdmin = reservesPendingAdmin;
         reservesAdmin = reservesPendingAdmin;
@@ -217,7 +217,7 @@ contract Factory is IFactory {
     }
 
     function _setReservesManager(address newReservesManager) external override {
-        require(msg.sender == reservesAdmin, "Eleos: UNAUTHORIZED");
+        require(msg.sender == reservesAdmin, "Amplify: UNAUTHORIZED");
         address oldReservesManager = reservesManager;
         reservesManager = newReservesManager;
         emit NewReservesManager(oldReservesManager, newReservesManager);

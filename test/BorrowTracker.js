@@ -1,7 +1,7 @@
 const {
 	Borrowable,
 	MockBorrowTracker,
-} = require('./Utils/Eleos');
+} = require('./Utils/Amplify');
 const {
 	expectAlmostEqualMantissa,
 	expectRevert,

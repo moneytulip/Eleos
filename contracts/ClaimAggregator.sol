@@ -19,5 +19,4 @@ contract ClaimAggregator {
 			amount += IFarmingPool(farmingPools[i]).claimAccount(account);
 		}
 	}
-
 }

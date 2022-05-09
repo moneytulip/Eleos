@@ -37,7 +37,7 @@ contract VaultToken is PoolToken {
     ) external {
         require(factory == address(0), "VaultToken: FACTORY_ALREADY_SET"); // sufficient check
         factory = msg.sender;
-        _setName("Eleos Vault Token", "vELEOS");
+        _setName("Amplify Vault Token", "vELEOS");
         WETH = _router.WETH();
         router = _router;
         masterChef = _masterChef;

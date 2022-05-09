@@ -2,12 +2,12 @@
 
 pragma solidity =0.8.9;
 
-import "./EleosERC20.sol";
+import "./AmplifyERC20.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IPoolToken.sol";
 import "./libraries/SafeMath.sol";
 
-contract PoolToken is EleosERC20 {
+contract PoolToken is AmplifyERC20 {
     using SafeMath for uint256;
 
     event Mint(
@@ -34,7 +34,7 @@ contract PoolToken is EleosERC20 {
 
     // called once by the factory
     function _setFactory() external {
-        require(factory == address(0), "Eleos: FACTORY_ALREADY_SET");
+        require(factory == address(0), "Amplify: FACTORY_ALREADY_SET");
         factory = msg.sender;
     }
 
@@ -69,7 +69,7 @@ contract PoolToken is EleosERC20 {
             mintTokens = mintTokens.sub(MINIMUM_LIQUIDITY);
             _mint(address(0), MINIMUM_LIQUIDITY);
         }
-        require(mintTokens > 0, "Eleos: MINT_AMOUNT_ZERO");
+        require(mintTokens > 0, "Amplify: MINT_AMOUNT_ZERO");
         _mint(minter, mintTokens);
         emit Mint(msg.sender, minter, mintAmount, mintTokens);
     }
@@ -85,8 +85,8 @@ contract PoolToken is EleosERC20 {
         uint256 redeemTokens = balanceOf[address(this)];
         redeemAmount = redeemTokens.mul(exchangeRate()).div(1e18);
 
-        require(redeemAmount > 0, "Eleos: REDEEM_AMOUNT_ZERO");
-        require(redeemAmount <= totalBalance, "Eleos: INSUFFICIENT_CASH");
+        require(redeemAmount > 0, "Amplify: REDEEM_AMOUNT_ZERO");
+        require(redeemAmount <= totalBalance, "Amplify: INSUFFICIENT_CASH");
         _burn(address(this), redeemTokens);
         _safeTransfer(redeemer, redeemAmount);
         emit Redeem(msg.sender, redeemer, redeemAmount, redeemTokens);
@@ -115,14 +115,14 @@ contract PoolToken is EleosERC20 {
         );
         require(
             success && (data.length == 0 || abi.decode(data, (bool))),
-            "Eleos: TRANSFER_FAILED"
+            "Amplify: TRANSFER_FAILED"
         );
     }
 
     // prevents a contract from calling itself, directly or indirectly.
     bool internal _notEntered = true;
     modifier nonReentrant() {
-        require(_notEntered, "Eleos: REENTERED");
+        require(_notEntered, "Amplify: REENTERED");
         _notEntered = false;
         _;
         _notEntered = true;

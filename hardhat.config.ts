@@ -24,6 +24,7 @@ const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
+      allowUnlimitedContractSize: true,
       gasPrice: 1000000000
     },
     oasistest: {

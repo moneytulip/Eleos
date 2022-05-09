@@ -4,7 +4,7 @@ pragma solidity =0.8.9;
 import "./CStorage.sol";
 import "./PoolToken.sol";
 import "./interfaces/IFactory.sol";
-import "./interfaces/IEleosPriceOracle.sol";
+import "./interfaces/IAmplifyPriceOracle.sol";
 
 contract CSetter is PoolToken, CStorage {
     uint256 public constant SAFETY_MARGIN_SQRT_MIN = 1.00e18; //safetyMargin: 100%
@@ -23,12 +23,12 @@ contract CSetter is PoolToken, CStorage {
         address _borrowable0,
         address _borrowable1
     ) external {
-        require(msg.sender == factory, "Eleos: UNAUTHORIZED"); // sufficient check
+        require(msg.sender == factory, "Amplify: UNAUTHORIZED"); // sufficient check
         _setName(_name, _symbol);
         underlying = _underlying;
         borrowable0 = _borrowable0;
         borrowable1 = _borrowable1;
-        eleosPriceOracle = address(IFactory(factory).eleosPriceOracle());
+        amplifyPriceOracle = address(IFactory(factory).amplifyPriceOracle());
     }
 
     function _setSafetyMarginSqrt(uint256 newSafetyMarginSqrt)
@@ -63,11 +63,11 @@ contract CSetter is PoolToken, CStorage {
         uint256 max
     ) internal view {
         _checkAdmin();
-        require(parameter >= min, "Eleos: INVALID_SETTING");
-        require(parameter <= max, "Eleos: INVALID_SETTING");
+        require(parameter >= min, "Amplify: INVALID_SETTING");
+        require(parameter <= max, "Amplify: INVALID_SETTING");
     }
 
     function _checkAdmin() internal view {
-        require(msg.sender == IFactory(factory).admin(), "Eleos: UNAUTHORIZED");
+        require(msg.sender == IFactory(factory).admin(), "Amplify: UNAUTHORIZED");
     }
 }

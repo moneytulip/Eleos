@@ -44,7 +44,7 @@ function leverage(
   );
   const permitDataA = A_IS_0 ? permitData0 : permitData1;
   const permitDataB = A_IS_0 ? permitData1 : permitData0;
-  console.log('pair', uniswapV2Pair.address)
+
   return router.leverage(
     uniswapV2Pair.address,
     t.amountADesired,

@@ -12,7 +12,7 @@ const {
   leverage,
   deleverage,
   permitGenerator,
-} = require("./Utils/EleosPeriphery");
+} = require("./Utils/AmplifyPeriphery");
 const { keccak256, toUtf8Bytes } = require("ethers").utils;
 
 const MAX_UINT_256 = new BN(2).pow(new BN(256)).sub(new BN(1));
@@ -28,7 +28,7 @@ const UniswapV2Router02 = artifacts.require(
 const UniswapV2Pair = artifacts.require(
   "UniswapV2Pair.sol"
 );
-const EleosPriceOracle = artifacts.require("EleosPriceOracle");
+const AmplifyPriceOracle = artifacts.require("AmplifyPriceOracle");
 const Factory = artifacts.require("Factory");
 const BDeployer = artifacts.require("BDeployer");
 const CDeployer = artifacts.require("CDeployer");
@@ -66,8 +66,8 @@ contract("Deleverage02", function (accounts) {
   let liquidator = accounts[3];
 
   let uniswapV2Factory;
-  let eleosPriceOracle;
-  let eleosFactory;
+  let amplifyPriceOracle;
+  let amplifyFactory;
   let WETH;
   let UNI;
   let uniswapV2Pair;
@@ -78,15 +78,15 @@ contract("Deleverage02", function (accounts) {
 
   beforeEach(async () => {
     uniswapV2Factory = await UniswapV2Factory.new(address(0));
-    eleosPriceOracle = await EleosPriceOracle.new();
+    amplifyPriceOracle = await AmplifyPriceOracle.new();
     const bDeployer = await BDeployer.new();
     const cDeployer = await CDeployer.new();
-    eleosFactory = await Factory.new(
+    amplifyFactory = await Factory.new(
       address(0),
       address(0),
       bDeployer.address,
       cDeployer.address,
-      eleosPriceOracle.address
+      amplifyPriceOracle.address
     );
     WETH = await WETH9.new();
     UNI = await MockERC20.new("Uniswap", "UNI");
@@ -105,20 +105,20 @@ contract("Deleverage02", function (accounts) {
     });
     await uniswapV2Pair.mint(borrower);
     LP_AMOUNT = await uniswapV2Pair.balanceOf(borrower);
-    await eleosPriceOracle.initialize(uniswapV2PairAddress);
-    collateralAddress = await eleosFactory.createCollateral.call(
+    await amplifyPriceOracle.initialize(uniswapV2PairAddress);
+    collateralAddress = await amplifyFactory.createCollateral.call(
       uniswapV2PairAddress
     );
-    borrowable0Address = await eleosFactory.createBorrowable0.call(
+    borrowable0Address = await amplifyFactory.createBorrowable0.call(
       uniswapV2PairAddress
     );
-    borrowable1Address = await eleosFactory.createBorrowable1.call(
+    borrowable1Address = await amplifyFactory.createBorrowable1.call(
       uniswapV2PairAddress
     );
-    await eleosFactory.createCollateral(uniswapV2PairAddress);
-    await eleosFactory.createBorrowable0(uniswapV2PairAddress);
-    await eleosFactory.createBorrowable1(uniswapV2PairAddress);
-    await eleosFactory.initializeLendingPool(uniswapV2PairAddress);
+    await amplifyFactory.createCollateral(uniswapV2PairAddress);
+    await amplifyFactory.createBorrowable0(uniswapV2PairAddress);
+    await amplifyFactory.createBorrowable1(uniswapV2PairAddress);
+    await amplifyFactory.initializeLendingPool(uniswapV2PairAddress);
     collateral = await Collateral.at(collateralAddress);
     const borrowable0 = await Borrowable.at(borrowable0Address);
     const borrowable1 = await Borrowable.at(borrowable1Address);
@@ -126,7 +126,7 @@ contract("Deleverage02", function (accounts) {
     if (ETH_IS_A) [borrowableWETH, borrowableUNI] = [borrowable0, borrowable1];
     else [borrowableWETH, borrowableUNI] = [borrowable1, borrowable0];
     router = await Router02.new(
-      eleosFactory.address,
+      amplifyFactory.address,
       bDeployer.address,
       cDeployer.address,
       WETH.address
@@ -222,7 +222,7 @@ contract("Deleverage02", function (accounts) {
         "0x",
         ETH_IS_A
       ),
-      "Eleos: TRANSFER_NOT_ALLOWED"
+      "Amplify: TRANSFER_NOT_ALLOWED"
     );
     const permit = await permitGenerator.permit(
       collateral,
@@ -242,7 +242,7 @@ contract("Deleverage02", function (accounts) {
         permit,
         ETH_IS_A
       ),
-      "EleosRouter: REDEEM_ZERO"
+      "AmplifyRouter: REDEEM_ZERO"
     );
     await expectRevert(
       deleverage(
@@ -256,8 +256,8 @@ contract("Deleverage02", function (accounts) {
         ETH_IS_A
       ),
       ETH_IS_A
-        ? "EleosRouter: INSUFFICIENT_A_AMOUNT"
-        : "EleosRouter: INSUFFICIENT_B_AMOUNT"
+        ? "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
+        : "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
     );
     await expectRevert(
       deleverage(
@@ -271,8 +271,8 @@ contract("Deleverage02", function (accounts) {
         ETH_IS_A
       ),
       ETH_IS_A
-        ? "EleosRouter: INSUFFICIENT_B_AMOUNT"
-        : "EleosRouter: INSUFFICIENT_A_AMOUNT"
+        ? "AmplifyRouter: INSUFFICIENT_B_AMOUNT"
+        : "AmplifyRouter: INSUFFICIENT_A_AMOUNT"
     );
 
     const balancePrior = await collateral.balanceOf(borrower);
