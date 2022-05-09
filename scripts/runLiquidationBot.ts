@@ -53,7 +53,9 @@ const toWei = (amount: Number, decimal = 18) => {
 
 async function main() {
   const CollateralFactory = await ethers.getContractFactory("Collateral");
-  const Erc20Factory = await ethers.getContractFactory("ERC20");
+  const Erc20Factory = await ethers.getContractFactory(
+    "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20"
+  );
   const RouterFactory = await ethers.getContractFactory("Router02");
   const router = await RouterFactory.attach(
     "0x5e8A25147e840C4F410EE33feEc4Ef96Db1A9063"
@@ -68,7 +70,7 @@ async function main() {
   const processPage = async (pageNumber: number) => {
     console.log(`Processing page ${pageNumber}`);
     const offset = pageNumber * PAGE_SIZE;
-    return await client
+    return client
       .query({
         query: gql(borrowPositionQuery),
         variables: {
@@ -85,68 +87,82 @@ async function main() {
         });
       })
       .then((users) =>
-        users.map((user: any) =>
-          user.borrowPositions.map(async (position: any) => {
-            const collateralAddr =
-              position.borrowable.lendingPool.collateral.id;
-            const collateral = await CollateralFactory.attach(collateralAddr);
-            // const tx = await collateral.accountLiquidity(user.id);
-            // await tx.wait();
-            // console.log('Processed liquidity calc tx');
-            const { liquidity, shortfall } =
-              await collateral.callStatic.accountLiquidity(user.id);
-            return { ...position, liquidity, shortfall, user: user };
-          })
-        )
+        users
+          .map((user: any) =>
+            user.borrowPositions.map(async (position: any) => {
+              const collateralAddr =
+                position.borrowable.lendingPool.collateral.id;
+              const collateral = await CollateralFactory.attach(collateralAddr);
+              // const tx = await collateral.accountLiquidity(user.id);
+              // await tx.wait();
+              // console.log('Processed liquidity calc tx');
+              const { liquidity, shortfall } =
+                await collateral.callStatic.accountLiquidity(user.id);
+              return { ...position, liquidity, shortfall, user: user };
+            })
+          )
+          .flat()
       )
-      .then((queriesPerUser) => queriesPerUser.flat())
-      .then(async (queries) =>
-        queries.map(async (query: any) => {
-          console.log("Preparing to query for shortfall");
-          const shorty = await query;
-          if (BN.from(shorty.shortfall).gt(0)) {
-            console.log("Approving Borrowable", shorty);
-            const underlying = await Erc20Factory.attach(
-              shorty.borrowable.underlying.id
-            );
-            console.log("Approving transfer for liquidator");
-            // TODO clean this up, remove dumb hardcoded max and approval amt
-            const dumbHardCodedAmt = 1e6;
-            const approve = await underlying.approve(
-              router.address,
-              BN.from(dumbHardCodedAmt),
-              { from: process.env.ADMIN_ADDRESS ?? "" }
-            );
-            // await approve.wait();
-            console.log("Completed approval", approve);
-            console.log(
-              "But do I need to also have a balance?",
-              await underlying.balanceOf(process.env.ADMIN_ADDRESS ?? "")
-            );
-            console.log("Preparing to liquidate", shorty);
-            const tx = await router.liquidate(
-              shorty.borrowable.id,
-              // TODO: handle token specific decimals on conversion
-              BN.from(dumbHardCodedAmt),
-              shorty.user.id,
-              process.env.ADMIN_ADDRESS,
-              moment().unix() + SECS_IN_HOUR
-            );
-            await tx.wait();
-            console.log("Liquidated?", tx);
-            return tx;
+      .then(async (queries) => {
+        const out = [];
+        for await (const q of queries) {
+          if (BN.from(q.shortfall).gt(0.0)) {
+            out.push(q);
           }
-          return null;
+        }
+        return out;
+      })
+      .then(async (shortfalls) =>
+        shortfalls.map(async (shorty: any) => {
+          console.log(shorty);
+          console.log("Approving Borrowable", shorty);
+          const underlying = await Erc20Factory.attach(
+            shorty.borrowable.underlying.id
+          );
+          console.log("Approving transfer for liquidator");
+          // TODO clean this up, remove dumb hardcoded max and approval amt
+          const dumbHardCodedAmt = 1e6;
+          const approve = await underlying.approve(
+            router.address,
+            BN.from(dumbHardCodedAmt),
+            { from: process.env.ADMIN_ADDRESS ?? "" }
+          );
+          await approve.wait();
+          console.log("Completed approval", approve);
+          console.log(
+            "But do I need to also have a balance?",
+            await underlying.balanceOf(process.env.ADMIN_ADDRESS ?? "")
+          );
+          console.log("Preparing to liquidate", shorty);
+          const tx = await router.liquidate(
+            shorty.borrowable.id,
+            // TODO: handle token specific decimals on conversion
+            BN.from(dumbHardCodedAmt),
+            shorty.user.id,
+            process.env.ADMIN_ADDRESS,
+            moment().unix() + SECS_IN_HOUR
+          );
+          await tx.wait();
+          console.log("Liquidated?", tx);
+          return tx;
         })
-      );
+      ).then(async (liquidationRequests) => {
+        const out = [];
+        for await (const tx of liquidationRequests) {
+          out.push(tx);
+        }
+        return out;
+      });
   };
 
   let pagesExhausted = false;
   let page = 0;
   while (!pagesExhausted) {
-    await processPage(page).catch(err => {
+    await processPage(page).catch((err) => {
       if (err.message === "EXHAUSTED_PAGES") {
         pagesExhausted = true;
+      } else {
+        throw err;
       }
     });
     page++;
